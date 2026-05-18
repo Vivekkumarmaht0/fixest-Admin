@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fixest Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#213145",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#001e2f",
+                        "surface-bright": "#f8f9ff",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "surface": "#f8f9ff",
+                        "primary-fixed": "#dbe1ff",
+                        "on-tertiary-fixed-variant": "#2f2ebe",
+                        "secondary-fixed": "#c9e6ff",
+                        "on-tertiary-fixed": "#07006c",
+                        "on-tertiary-container": "#f1eeff",
+                        "outline-variant": "#c3c6d7",
+                        "primary-container": "#2563eb",
+                        "tertiary": "#3e3fcc",
+                        "outline": "#737686",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-background": "#0b1c30",
+                        "primary": "#004ac6",
+                        "secondary-container": "#39b8fd",
+                        "on-secondary-container": "#004666",
+                        "surface-dim": "#cbdbf5",
+                        "secondary": "#006591",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#e5eeff",
+                        "surface-container-low": "#eff4ff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "tertiary-fixed-dim": "#c0c1ff",
+                        "background": "#f8f9ff",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#b4c5ff",
+                        "on-secondary-fixed-variant": "#004c6e",
+                        "secondary-fixed-dim": "#89ceff",
+                        "tertiary-container": "#585be6",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#0b1c30",
+                        "surface-tint": "#0053db",
+                        "on-primary-container": "#eeefff",
+                        "tertiary-fixed": "#e1e0ff",
+                        "on-primary-fixed": "#00174b",
+                        "surface-variant": "#d3e4fe",
+                        "surface-container-high": "#dce9ff",
+                        "on-surface-variant": "#434655"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "container-padding-mobile": "16px",
+                        "gutter": "24px",
+                        "container-padding-desktop": "32px",
+                        "sidebar-width": "260px",
+                        "table-row-height": "48px"
+                    },
+                    "fontFamily": {
+                        "title-lg": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "display-lg": ["Geist"],
+                        "label-sm": ["Geist"],
+                        "title-md": ["Geist"],
+                        "body-md": ["Geist"],
+                        "label-md": ["Geist"],
+                        "headline-md": ["Geist"]
+                    },
+                    "fontSize": {
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "600" }],
+                        "title-md": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.4) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255,255,255,0.8);
+            border-left: 1px solid rgba(255,255,255,0.5);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        .glass-row:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+        .glass-row:nth-child(odd) {
+            background-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md flex h-screen overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- SideNavBar (Shared Component) -->
+<nav class="hidden lg:flex flex-col h-screen fixed left-0 top-0 py-6 px-4 bg-surface/60 backdrop-blur-2xl border-r border-white/40 shadow-xl w-[260px] z-50">
+<!-- Header -->
+<div class="flex items-center gap-3 mb-8 px-2">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined" data-icon="build" style="font-variation-settings: 'FILL' 1;">build</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-black text-primary tracking-tight">Fixest Admin</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Premium Repair Portal</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex-1 space-y-2">
+<!-- Active: Dashboard -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary border-r-4 border-primary font-bold scale-[0.98] transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-white/5 hover:translate-x-1 transition-all duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="event_note">event_note</span>
+                Bookings
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-white/5 hover:translate-x-1 transition-all duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+                Inventory
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-white/5 hover:translate-x-1 transition-all duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+                Team
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-white/5 hover:translate-x-1 transition-all duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                Settings
+            </a>
+</div>
+<!-- Footer Links -->
+<div class="space-y-2 mt-auto border-t border-white/40 pt-4">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-white/5 hover:translate-x-1 transition-all duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+                Support
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-white/5 hover:translate-x-1 transition-all duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+                Logout
+            </a>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<main class="flex-1 flex flex-col lg:ml-[260px] relative w-full h-screen overflow-hidden bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHBhdGggZD0iTTIwIDIwTDIwIDQwTTIwIDIwTDAgMjBNMjAgMjBMMTQgMTRNMjAgMjBMMjYgMjYiIHN0cm9rZT0icmdiYSgwLDc0LDE5OCwwLjAyKSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIi8+PC9zdmc+')]">
+<!-- TopAppBar (Shared Component) -->
+<header class="sticky top-0 z-40 flex justify-between items-center px-container-padding-desktop w-full h-16 bg-surface/80 backdrop-blur-xl border-b border-white/40 shadow-sm transition-colors">
+<!-- Left: Brand (Mobile) / Search (Desktop) -->
+<div class="flex items-center gap-4 flex-1">
+<div class="lg:hidden">
+<span class="font-headline-md text-headline-md font-bold text-primary">Fixest</span>
+</div>
+<div class="hidden lg:flex items-center w-full max-w-md bg-surface-container-lowest/50 border border-outline-variant rounded-full px-4 py-2 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary-fixed transition-all">
+<span class="material-symbols-outlined text-on-surface-variant mr-2" data-icon="search">search</span>
+<input class="bg-transparent border-none outline-none w-full text-on-surface placeholder:text-on-surface-variant font-body-md text-body-md p-0 focus:ring-0" placeholder="Search bookings, parts, or customers..." type="text"/>
+</div>
+</div>
+<!-- Right: Actions & Profile -->
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-full text-on-surface-variant hover:bg-white/10 transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 rounded-full text-on-surface-variant hover:bg-white/10 transition-colors flex items-center justify-center mr-2">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary-container border border-white/50 overflow-hidden shadow-sm">
+<img alt="Administrator profile photo" class="w-full h-full object-cover" data-alt="A professional headshot of a mature male executive with short greying hair, wearing a crisp light blue button-down shirt. The lighting is bright and even, set against a neutral, high-key studio background that matches a clean, modern UI light-mode aesthetic. The expression is confident and welcoming." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoK278VG1xJEQDFpzxNx-UhrcQfTSDi6c5usOMjEgqfW3ODepjE_ugKGr9tdp66w-SWFCB0mFP5XWOp4v8BnnJd5OsTp9ChaybAkWyAkUwVXcZJfnaemTGmrChYjBm7PfaO1hFuHJM4eIkO_up7qSE9JS-P4mNZ4IGGwRg0gdvFT58lCh7BpsEZGx-NSqX6FMAQu40c199A8pGgkpjw9VaL-yhOA5GrGVag_1RUjJluRjxPOpkiiRsTYn0kJ6BnRS7iW7YfaR0Rw"/>
+</div>
+</div>
+</header>
+<!-- Dashboard Canvas -->
+<div class="flex-1 overflow-y-auto p-gutter lg:p-container-padding-desktop pb-24">
+<div class="mb-8">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Dashboard Overview</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Real-time metrics and recent repair activities.</p>
+</div>
+<!-- Top-level Metrics Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<!-- Metric 1: Total Bookings -->
+<div class="glass-card rounded-xl p-6 group hover:shadow-lg transition-all duration-300 relative overflow-hidden">
+<div class="absolute -right-6 -top-6 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors"></div>
+<div class="flex items-start justify-between mb-4 relative z-10">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined" data-icon="book_online">book_online</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary bg-primary/10 px-2 py-1 rounded-md flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="trending_up">trending_up</span> +12%
+                        </span>
+</div>
+<div class="relative z-10">
+<p class="font-label-md text-label-md text-on-surface-variant mb-1">Total Bookings</p>
+<h3 class="font-display-lg text-display-lg text-on-surface">1,284</h3>
+</div>
+</div>
+<!-- Metric 2: Active Repairs -->
+<div class="glass-card rounded-xl p-6 group hover:shadow-lg transition-all duration-300 relative overflow-hidden">
+<div class="absolute -right-6 -top-6 w-24 h-24 bg-tertiary/5 rounded-full blur-2xl group-hover:bg-tertiary/10 transition-colors"></div>
+<div class="flex items-start justify-between mb-4 relative z-10">
+<div class="w-10 h-10 rounded-lg bg-tertiary-container flex items-center justify-center text-on-tertiary-container">
+<span class="material-symbols-outlined" data-icon="engineering" style="font-variation-settings: 'FILL' 1;">engineering</span>
+</div>
+</div>
+<div class="relative z-10">
+<p class="font-label-md text-label-md text-on-surface-variant mb-1">Active Repairs</p>
+<h3 class="font-display-lg text-display-lg text-on-surface">47</h3>
+</div>
+</div>
+<!-- Metric 3: Completed -->
+<div class="glass-card rounded-xl p-6 group hover:shadow-lg transition-all duration-300 relative overflow-hidden">
+<div class="absolute -right-6 -top-6 w-24 h-24 bg-secondary/5 rounded-full blur-2xl group-hover:bg-secondary/10 transition-colors"></div>
+<div class="flex items-start justify-between mb-4 relative z-10">
+<div class="w-10 h-10 rounded-lg bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary bg-secondary/10 px-2 py-1 rounded-md flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="trending_up">trending_up</span> +5%
+                        </span>
+</div>
+<div class="relative z-10">
+<p class="font-label-md text-label-md text-on-surface-variant mb-1">Completed (This Week)</p>
+<h3 class="font-display-lg text-display-lg text-on-surface">312</h3>
+</div>
+</div>
+<!-- Metric 4: Cancelled -->
+<div class="glass-card rounded-xl p-6 group hover:shadow-lg transition-all duration-300 relative overflow-hidden">
+<div class="absolute -right-6 -top-6 w-24 h-24 bg-error/5 rounded-full blur-2xl group-hover:bg-error/10 transition-colors"></div>
+<div class="flex items-start justify-between mb-4 relative z-10">
+<div class="w-10 h-10 rounded-lg bg-error-container flex items-center justify-center text-on-error-container">
+<span class="material-symbols-outlined" data-icon="cancel" style="font-variation-settings: 'FILL' 1;">cancel</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-variant px-2 py-1 rounded-md flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="trending_down">trending_down</span> -2%
+                        </span>
+</div>
+<div class="relative z-10">
+<p class="font-label-md text-label-md text-on-surface-variant mb-1">Cancelled</p>
+<h3 class="font-display-lg text-display-lg text-on-surface">14</h3>
+</div>
+</div>
+</div>
+<!-- Recent Activity Feed (Glassmorphic Table) -->
+<div class="glass-card rounded-xl overflow-hidden flex flex-col">
+<div class="px-6 py-5 border-b border-white/40 flex justify-between items-center bg-surface-container-lowest/30">
+<h3 class="font-title-lg text-title-lg text-on-surface">Recent Activity Feed</h3>
+<button class="font-label-md text-label-md text-primary hover:text-primary-fixed-variant transition-colors flex items-center gap-1">
+                        View All <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<div class="overflow-x-auto w-full">
+<table class="w-full text-left border-collapse min-w-[800px]">
+<thead>
+<tr class="border-b border-outline-variant/50 bg-surface-container/50 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+<th class="py-3 px-6 font-semibold">Booking ID</th>
+<th class="py-3 px-6 font-semibold">Customer</th>
+<th class="py-3 px-6 font-semibold">Device / Issue</th>
+<th class="py-3 px-6 font-semibold">Date</th>
+<th class="py-3 px-6 font-semibold">Status</th>
+<th class="py-3 px-6 font-semibold text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md text-on-surface">
+<!-- Row 1 -->
+<tr class="glass-row h-table-row-height border-b border-white/20 hover:bg-white/60 transition-colors">
+<td class="py-2 px-6 font-medium text-primary">#FX-8992</td>
+<td class="py-2 px-6 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface font-label-sm">JS</div>
+<span>John Smith</span>
+</td>
+<td class="py-2 px-6 text-on-surface-variant">iPhone 13 Pro - Screen</td>
+<td class="py-2 px-6 text-on-surface-variant">Today, 10:42 AM</td>
+<td class="py-2 px-6">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-variant text-on-surface-variant">
+                                        Received
+                                    </span>
+</td>
+<td class="py-2 px-6 text-right">
+<button class="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors" title="View Details">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="glass-row h-table-row-height border-b border-white/20 hover:bg-white/60 transition-colors">
+<td class="py-2 px-6 font-medium text-primary">#FX-8991</td>
+<td class="py-2 px-6 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface font-label-sm">AW</div>
+<span>Alice Wong</span>
+</td>
+<td class="py-2 px-6 text-on-surface-variant">MacBook Air M1 - Battery</td>
+<td class="py-2 px-6 text-on-surface-variant">Today, 09:15 AM</td>
+<td class="py-2 px-6">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-tertiary-container text-on-tertiary-container shadow-[0_0_10px_rgba(88,91,230,0.1)]">
+                                        Diagnosis
+                                    </span>
+</td>
+<td class="py-2 px-6 text-right">
+<button class="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors" title="View Details">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="glass-row h-table-row-height border-b border-white/20 hover:bg-white/60 transition-colors">
+<td class="py-2 px-6 font-medium text-primary">#FX-8990</td>
+<td class="py-2 px-6 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface font-label-sm">MR</div>
+<span>Marcus Reed</span>
+</td>
+<td class="py-2 px-6 text-on-surface-variant">Samsung S22 - Charging Port</td>
+<td class="py-2 px-6 text-on-surface-variant">Yesterday, 14:30 PM</td>
+<td class="py-2 px-6">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-secondary-container text-on-secondary-container shadow-[0_0_10px_rgba(57,184,253,0.1)]">
+                                        Ready
+                                    </span>
+</td>
+<td class="py-2 px-6 text-right">
+<button class="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors" title="View Details">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="glass-row h-table-row-height border-b border-white/20 hover:bg-white/60 transition-colors">
+<td class="py-2 px-6 font-medium text-primary">#FX-8989</td>
+<td class="py-2 px-6 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface font-label-sm">EK</div>
+<span>Elena Kosta</span>
+</td>
+<td class="py-2 px-6 text-on-surface-variant">iPad Pro 11 - Water Damage</td>
+<td class="py-2 px-6 text-on-surface-variant">Yesterday, 11:05 AM</td>
+<td class="py-2 px-6">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-primary-container text-on-primary-container shadow-[0_0_10px_rgba(37,99,235,0.1)]">
+                                        Delivered
+                                    </span>
+</td>
+<td class="py-2 px-6 text-right">
+<button class="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors" title="View Details">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="glass-row h-table-row-height hover:bg-white/60 transition-colors">
+<td class="py-2 px-6 font-medium text-primary">#FX-8988</td>
+<td class="py-2 px-6 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface font-label-sm">TB</div>
+<span>Tom Baker</span>
+</td>
+<td class="py-2 px-6 text-on-surface-variant">Pixel 6 - Camera Lens</td>
+<td class="py-2 px-6 text-on-surface-variant">Oct 24, 08:20 AM</td>
+<td class="py-2 px-6">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-error-container text-on-error-container shadow-[0_0_10px_rgba(255,218,214,0.1)]">
+                                        Cancelled
+                                    </span>
+</td>
+<td class="py-2 px-6 text-right">
+<button class="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors" title="View Details">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility">visibility</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fixest - Booking Details</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#213145",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#001e2f",
+                        "surface-bright": "#f8f9ff",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "surface": "#f8f9ff",
+                        "primary-fixed": "#dbe1ff",
+                        "on-tertiary-fixed-variant": "#2f2ebe",
+                        "secondary-fixed": "#c9e6ff",
+                        "on-tertiary-fixed": "#07006c",
+                        "on-tertiary-container": "#f1eeff",
+                        "outline-variant": "#c3c6d7",
+                        "primary-container": "#2563eb",
+                        "tertiary": "#3e3fcc",
+                        "outline": "#737686",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-background": "#0b1c30",
+                        "primary": "#004ac6",
+                        "secondary-container": "#39b8fd",
+                        "on-secondary-container": "#004666",
+                        "surface-dim": "#cbdbf5",
+                        "secondary": "#006591",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#e5eeff",
+                        "surface-container-low": "#eff4ff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "tertiary-fixed-dim": "#c0c1ff",
+                        "background": "#f8f9ff",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#b4c5ff",
+                        "on-secondary-fixed-variant": "#004c6e",
+                        "secondary-fixed-dim": "#89ceff",
+                        "tertiary-container": "#585be6",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#0b1c30",
+                        "surface-tint": "#0053db",
+                        "on-primary-container": "#eeefff",
+                        "tertiary-fixed": "#e1e0ff",
+                        "on-primary-fixed": "#00174b",
+                        "surface-variant": "#d3e4fe",
+                        "surface-container-high": "#dce9ff",
+                        "on-surface-variant": "#434655"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "container-padding-mobile": "16px",
+                        "gutter": "24px",
+                        "container-padding-desktop": "32px",
+                        "sidebar-width": "260px",
+                        "table-row-height": "48px"
+                    },
+                    "fontFamily": {
+                        "title-lg": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "display-lg": ["Geist"],
+                        "label-sm": ["Geist"],
+                        "title-md": ["Geist"],
+                        "body-md": ["Geist"],
+                        "label-md": ["Geist"],
+                        "headline-md": ["Geist"]
+                    },
+                    "fontSize": {
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "600" }],
+                        "title-md": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Geist', sans-serif; }
+        .glass-panel {
+            background: rgba(248, 249, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            background-image: linear-gradient(to bottom, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        .glass-overlay {
+            background: rgba(203, 219, 245, 0.3);
+            backdrop-filter: blur(8px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface h-screen w-full overflow-hidden flex font-body-md">
+<!-- Sidebar Component from JSON -->
+<aside class="hidden lg:flex flex-col h-screen fixed left-0 top-0 py-6 px-4 bg-surface/60 dark:bg-inverse-surface/90 backdrop-blur-2xl border-r border-white/40 dark:border-white/10 shadow-xl fixed left-0 top-0 h-full w-[260px] z-50">
+<div class="mb-8 px-2 flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary font-bold shadow-md">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">build</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-black text-primary dark:text-inverse-primary tracking-tight">Fixest Admin</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Premium Repair Portal</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:bg-white/5 hover:translate-x-1 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<!-- Active State Applied Here based on intent -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md bg-primary/10 text-primary dark:bg-primary-container/20 dark:text-primary-fixed border-r-4 border-primary font-bold scale-[0.98] transition-all" href="#">
+<span class="material-symbols-outlined">event_note</span>
+                Bookings
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:bg-white/5 hover:translate-x-1 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+                Inventory
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:bg-white/5 hover:translate-x-1 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">group</span>
+                Team
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:bg-white/5 hover:translate-x-1 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+</nav>
+<div class="mt-auto border-t border-outline-variant/30 pt-4 flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:bg-white/5 hover:translate-x-1 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">help</span>
+                Support
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md text-error hover:bg-error-container/20 hover:translate-x-1 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">logout</span>
+                Logout
+            </a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col ml-0 lg:ml-[260px] h-full relative">
+<!-- TopAppBar Component from JSON -->
+<header class="sticky top-0 z-40 flex justify-between items-center px-container-padding-desktop w-full h-16 bg-surface/80 dark:bg-inverse-surface/80 backdrop-blur-xl border-b border-white/40 dark:border-white/10 shadow-sm backdrop-blur-md">
+<div class="flex items-center gap-4">
+<button class="lg:hidden p-2 text-on-surface-variant rounded-full hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="relative hidden md:block w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+<input class="w-full pl-9 pr-4 py-1.5 bg-surface-container-low border border-outline-variant/50 rounded-full font-body-md text-body-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all" placeholder="Search bookings..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 text-on-surface-variant rounded-full hover:bg-white/10 transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-2 text-on-surface-variant rounded-full hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant/30 ml-2">
+<img alt="Administrator profile photo" class="w-full h-full object-cover" data-alt="Close up portrait of a professional administrator in a modern office setting, well lit with soft daylight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9LtNo-ClpTN1DbPC1WpwTFC1x0Zfjij8-_juG2v0MvsHlozzy8ULUqEkCR1Afnty6tldIWvbULK8ApTsI4C19Qy4DDY6f1n7jGdngdvjrGUY_DFDIQjEfpqaoSZUhItRHepQSYSIqDF3aZ_tLcDWvvpQjd-UD-W7OZARi4EqgyyR7ba0ju8m0CAWCBwFFAucCmkE9PAnw5jCZ4x2gShmAmAfOgg2-wvXlQEm_logsh2tpRFtlcOE_H5RSJPMcJLKUXMKK3ufbCg"/>
+</div>
+</div>
+</header>
+<!-- Simulated Background Content (Bookings List) to show overlay effect -->
+<div class="p-container-padding-desktop flex-1 overflow-y-auto">
+<div class="flex justify-between items-end mb-6">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Active Bookings</h2>
+<p class="text-on-surface-variant mt-1">Manage ongoing repairs and incoming requests.</p>
+</div>
+<button class="px-4 py-2 bg-primary text-on-primary rounded-lg font-title-md text-title-md shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">add</span>
+                    New Booking
+                </button>
+</div>
+<!-- Dummy Table Structure -->
+<div class="glass-panel rounded-xl overflow-hidden">
+<div class="grid grid-cols-6 gap-4 p-4 border-b border-outline-variant/30 bg-surface-container/50 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+<div class="col-span-1">ID</div>
+<div class="col-span-2">Customer</div>
+<div class="col-span-2">Device</div>
+<div class="col-span-1">Status</div>
+</div>
+<div class="flex flex-col">
+<div class="grid grid-cols-6 gap-4 p-4 border-b border-outline-variant/10 hover:bg-surface-container-low transition-colors items-center cursor-pointer">
+<div class="font-body-md font-medium text-primary">#FX-1042</div>
+<div class="col-span-2 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-xs">JD</div>
+<span class="font-title-md text-body-md">John Doe</span>
+</div>
+<div class="col-span-2 text-on-surface-variant">MacBook Pro 16" (2021)</div>
+<div><span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">Received</span></div>
+</div>
+</div>
+</div>
+</div>
+<!-- MODAL OVERLAY: Booking Detail View -->
+<div class="absolute inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-12 glass-overlay">
+<div class="w-full max-w-4xl max-h-full glass-panel rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+<!-- Modal Header -->
+<div class="px-6 py-4 border-b border-outline-variant/30 flex justify-between items-center bg-surface/50 backdrop-blur-md sticky top-0 z-10">
+<div class="flex items-center gap-4">
+<h2 class="font-title-lg text-title-lg text-on-surface">Booking Details</h2>
+<span class="px-2.5 py-0.5 rounded-md bg-surface-container-highest text-on-surface-variant font-label-md text-label-md font-bold">#FX-1042</span>
+</div>
+<button class="p-1.5 rounded-full hover:bg-outline-variant/20 text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Modal Body - Bento Grid Layout -->
+<div class="p-6 overflow-y-auto flex-1 bg-gradient-to-br from-transparent to-surface-container-low/30">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Left Column: Customer & Device (2/3 width on md) -->
+<div class="md:col-span-2 space-y-6">
+<!-- Customer Info Card -->
+<div class="bg-surface/60 rounded-xl p-5 border border-white/50 shadow-sm relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-secondary-container"></div>
+<h3 class="font-title-md text-title-md text-on-surface flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">person</span>
+                                    Customer Information
+                                </h3>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="flex gap-3 items-start">
+<div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-title-lg text-title-lg shadow-sm">
+                                            JD
+                                        </div>
+<div>
+<div class="font-title-md text-title-md text-on-surface">John Doe</div>
+<div class="font-label-md text-label-md text-on-surface-variant flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px]">star</span> VIP Client
+                                            </div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex items-center gap-2 font-body-md text-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">mail</span>
+                                            john.doe@example.com
+                                        </div>
+<div class="flex items-center gap-2 font-body-md text-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">call</span>
+                                            +1 (555) 123-4567
+                                        </div>
+</div>
+</div>
+</div>
+<!-- Device & Issue Card -->
+<div class="bg-surface/60 rounded-xl p-5 border border-white/50 shadow-sm relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary-container"></div>
+<h3 class="font-title-md text-title-md text-on-surface flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">devices</span>
+                                    Device &amp; Diagnostics
+                                </h3>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+<div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Brand &amp; Model</div>
+<div class="font-title-md text-title-md text-on-surface">Apple MacBook Pro 16"</div>
+<div class="font-body-md text-body-md text-on-surface-variant mt-1">M1 Max, 32GB RAM, 1TB SSD (Late 2021)</div>
+</div>
+<div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Serial Number</div>
+<div class="font-title-md text-title-md font-mono text-on-surface">C02G84R4MD6M</div>
+<div class="font-body-md text-body-md text-on-surface-variant mt-1 flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span> Warranty Expired
+                                        </div>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-lg p-4 border border-outline-variant/20">
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Reported Issue</div>
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">
+                                        "Screen occasionally flickers when opening the lid past 90 degrees. Battery also seems to drain unusually fast while in sleep mode. Dropped roughly a month ago, small dent on bottom right corner."
+                                    </p>
+</div>
+</div>
+</div>
+<!-- Right Column: Status & Actions (1/3 width on md) -->
+<div class="space-y-6">
+<!-- Status Management Card -->
+<div class="bg-surface/60 rounded-xl p-5 border border-white/50 shadow-sm">
+<h3 class="font-title-md text-title-md text-on-surface mb-4">Update Status</h3>
+<div class="flex flex-col gap-2">
+<button class="w-full flex items-center justify-between p-3 rounded-lg bg-slate-100 text-slate-800 border border-slate-300 font-title-md text-title-md shadow-sm transition-all">
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">inbox</span> Received</span>
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+</button>
+<button class="w-full flex items-center justify-between p-3 rounded-lg bg-surface hover:bg-indigo-50 text-on-surface-variant hover:text-indigo-700 border border-outline-variant/30 hover:border-indigo-300 font-title-md text-title-md transition-all group">
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">build_circle</span> Diagnosis &amp; Repair</span>
+</button>
+<button class="w-full flex items-center justify-between p-3 rounded-lg bg-surface hover:bg-emerald-50 text-on-surface-variant hover:text-emerald-700 border border-outline-variant/30 hover:border-emerald-300 font-title-md text-title-md transition-all group">
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">verified</span> Ready for Pickup</span>
+</button>
+<button class="w-full flex items-center justify-between p-3 rounded-lg bg-surface hover:bg-blue-50 text-on-surface-variant hover:text-blue-700 border border-outline-variant/30 hover:border-blue-300 font-title-md text-title-md transition-all group">
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">local_shipping</span> Delivered</span>
+</button>
+</div>
+</div>
+<!-- Quick Actions Card -->
+<div class="bg-surface/60 rounded-xl p-5 border border-white/50 shadow-sm">
+<h3 class="font-title-md text-title-md text-on-surface mb-4">Quick Actions</h3>
+<div class="grid grid-cols-2 gap-2">
+<button class="flex flex-col items-center justify-center p-3 rounded-lg bg-surface-container-low hover:bg-surface-container border border-outline-variant/20 transition-colors gap-1 text-on-surface">
+<span class="material-symbols-outlined text-primary">receipt_long</span>
+<span class="font-label-md text-label-md">Invoice</span>
+</button>
+<button class="flex flex-col items-center justify-center p-3 rounded-lg bg-surface-container-low hover:bg-surface-container border border-outline-variant/20 transition-colors gap-1 text-on-surface">
+<span class="material-symbols-outlined text-primary">chat</span>
+<span class="font-label-md text-label-md">Message</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="px-6 py-4 border-t border-outline-variant/30 bg-surface/50 backdrop-blur-md flex justify-end gap-3 rounded-b-2xl">
+<button class="px-5 py-2 rounded-lg font-title-md text-title-md text-primary bg-transparent border border-primary hover:bg-primary/5 transition-colors">
+                        Cancel
+                    </button>
+<button class="px-5 py-2 rounded-lg font-title-md text-title-md text-on-primary bg-gradient-to-r from-primary to-secondary shadow-md hover:shadow-lg transition-shadow">
+                        Save Changes
+                    </button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

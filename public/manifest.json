@@ -1,0 +1,26 @@
+{
+  "name": "Fixest Admin Dashboard",
+  "short_name": "Fixest Admin",
+  "description": "Progressive Web App for managing Fixest device repairs and bookings.",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#0b1c30",
+  "theme_color": "#004ac6",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/pwa-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/pwa-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

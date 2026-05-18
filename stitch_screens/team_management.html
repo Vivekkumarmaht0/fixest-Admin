@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Team Management - Fixest Admin</title>
+<!-- Google Fonts: Geist & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#004c6e",
+                        "secondary": "#006591",
+                        "secondary-container": "#39b8fd",
+                        "primary": "#004ac6",
+                        "on-surface": "#0b1c30",
+                        "inverse-primary": "#b4c5ff",
+                        "surface-container-high": "#dce9ff",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#c3c6d7",
+                        "on-tertiary-fixed": "#07006c",
+                        "tertiary": "#3e3fcc",
+                        "error": "#ba1a1a",
+                        "surface-container": "#e5eeff",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#e1e0ff",
+                        "surface": "#f8f9ff",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#434655",
+                        "outline": "#737686",
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#dbe1ff",
+                        "on-primary-container": "#eeefff",
+                        "surface-variant": "#d3e4fe",
+                        "on-secondary-fixed": "#001e2f",
+                        "tertiary-fixed-dim": "#c0c1ff",
+                        "surface-bright": "#f8f9ff",
+                        "surface-dim": "#cbdbf5",
+                        "on-primary-fixed": "#00174b",
+                        "surface-container-low": "#eff4ff",
+                        "primary-container": "#2563eb",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-container": "#f1eeff",
+                        "secondary-fixed-dim": "#89ceff",
+                        "on-tertiary-fixed-variant": "#2f2ebe",
+                        "on-secondary-container": "#004666",
+                        "surface-container-highest": "#d3e4fe",
+                        "background": "#f8f9ff",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface-tint": "#0053db",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#c9e6ff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "inverse-surface": "#213145",
+                        "tertiary-container": "#585be6",
+                        "on-background": "#0b1c30"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "table-row-height": "48px",
+                        "unit": "4px",
+                        "container-padding-desktop": "32px",
+                        "sidebar-width": "260px",
+                        "gutter": "24px",
+                        "container-padding-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Geist"], "body-md": ["Geist"], "headline-md": ["Geist"],
+                        "body-lg": ["Geist"], "title-lg": ["Geist"], "label-sm": ["Geist"],
+                        "title-md": ["Geist"], "headline-lg": ["Geist"], "label-md": ["Geist"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "600" }],
+                        "title-md": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Glassmorphic Utilities */
+        .glass-panel {
+            background: rgba(248, 249, 255, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .glass-edge-top {
+            background: linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 100%);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased min-h-screen flex selection:bg-primary-container selection:text-on-primary-container">
+<!-- Ambient Background Gradients -->
+<div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+<div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[100px]"></div>
+<div class="absolute bottom-[-10%] right-[-5%] w-[50%] h-[50%] rounded-full bg-secondary/5 blur-[120px]"></div>
+</div>
+<!-- SideNavBar (Hidden on Mobile, flex on lg) -->
+<nav class="hidden lg:flex flex-col bg-surface-container-low/80 backdrop-blur-2xl text-primary font-label-md text-label-md tracking-wide fixed left-0 top-0 h-screen w-sidebar-width z-50 border-r border-white/10 shadow-[4px_0_24px_rgba(0,0,0,0.02)] py-6 gap-2">
+<!-- Brand Header -->
+<div class="px-6 pb-6 mb-2 border-b border-outline-variant/10">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white shadow-sm">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">build_circle</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-extrabold bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent">Fixest Admin</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant/70">Repair Management</p>
+</div>
+</div>
+</div>
+<!-- Main Navigation -->
+<div class="flex flex-col gap-1 px-2 flex-1">
+<a class="flex items-center gap-3 text-on-surface-variant px-4 py-3 hover:translate-x-1 transition-transform hover:bg-white/5 rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant px-4 py-3 hover:translate-x-1 transition-transform hover:bg-white/5 rounded-lg" href="#">
+<span class="material-symbols-outlined">build</span>
+                Repair Logs
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant px-4 py-3 hover:translate-x-1 transition-transform hover:bg-white/5 rounded-lg" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+                Inventory
+            </a>
+<!-- Active Tab -->
+<a class="flex items-center gap-3 bg-gradient-to-r from-primary/10 to-transparent text-primary border-l-4 border-primary px-4 py-3 font-semibold rounded-r-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+                Team
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant px-4 py-3 hover:translate-x-1 transition-transform hover:bg-white/5 rounded-lg" href="#">
+<span class="material-symbols-outlined">person_search</span>
+                Customers
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant px-4 py-3 hover:translate-x-1 transition-transform hover:bg-white/5 rounded-lg" href="#">
+<span class="material-symbols-outlined">settings_suggest</span>
+                Settings
+            </a>
+</div>
+<!-- CTA & Footer -->
+<div class="px-4 mt-auto space-y-4">
+<button class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-secondary text-white font-title-md text-title-md py-3 rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                New Repair Ticket
+            </button>
+<div class="pt-4 border-t border-outline-variant/10 space-y-1">
+<a class="flex items-center gap-3 text-on-surface-variant px-4 py-2 hover:translate-x-1 transition-transform rounded-lg text-sm" href="#">
+<span class="material-symbols-outlined text-[18px]">help</span>
+                    Help Center
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant px-4 py-2 hover:translate-x-1 transition-transform rounded-lg text-sm" href="#">
+<span class="material-symbols-outlined text-[18px]">logout</span>
+                    Logout
+                </a>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 lg:ml-sidebar-width min-h-screen flex flex-col relative z-10">
+<!-- TopNavBar -->
+<header class="bg-surface/60 backdrop-blur-xl border-b border-white/20 shadow-[0_4px_30px_rgba(0,0,0,0.05)] text-primary font-body-md text-body-md docked full-width top-0 z-40 fixed w-full lg:w-[calc(100%-260px)]">
+<div class="flex justify-between items-center w-full px-container-padding-mobile md:px-container-padding-desktop h-16">
+<!-- Search Bar (Left aligned per JSON) -->
+<div class="flex-1 max-w-md">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-surface-container-highest/30 border border-outline-variant/30 text-on-surface rounded-full pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all placeholder:text-outline/70 glass-panel" placeholder="Search team members..." type="text"/>
+</div>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-full text-on-surface-variant hover:bg-white/50 transition-all duration-300 active:scale-95 relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border border-white"></span>
+</button>
+<button class="p-2 rounded-full text-on-surface-variant hover:bg-white/50 transition-all duration-300 active:scale-95">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-px bg-outline-variant/20 mx-2"></div>
+<button class="flex items-center gap-2 p-1 pr-3 rounded-full hover:bg-white/50 transition-all border border-transparent hover:border-white/40">
+<img alt="User Avatar" class="w-8 h-8 rounded-full border border-white/60 shadow-sm" data-alt="A close-up, professional headshot of a middle-aged male executive with short dark hair and glasses, wearing a tailored navy suit against a clean, light-grey studio background. The lighting is soft and flattering, highlighting a confident, approachable expression typical of high-end corporate portraiture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvgL20wEkbUsOd3TqcqPCi9zJz41P0UCl5CNSpr8MK9cZACmRBgmEJOif1FScG9quq8jt-0-SU2ihRpg477v38YqOfe_jTOmXQAa1NMruWrzUXv3B1Bu9g3qWh_WhY-ZYFNyGNy0FR9e9NNlx89xxDZkeA76FPGy1Dc-cScuXV0He02S8AUdCFqTbUzha9j3QMH9zBE-ydDSULP0El2euvUjvgPISl0nn23gHiDy9HKSfLSpUj4Gb7hrorhLYQYJQ8nJ2AVghzgw"/>
+<span class="font-label-md text-label-md text-on-surface hidden md:block">Admin</span>
+<span class="material-symbols-outlined text-outline text-[18px]">expand_more</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Canvas / Page Content -->
+<div class="flex-1 p-container-padding-mobile md:p-container-padding-desktop pt-[calc(64px+32px)] md:pt-[calc(64px+32px)] flex flex-col gap-gutter">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Team Management</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Manage access, roles, and view active staff across all repair centers.</p>
+</div>
+<button class="flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-secondary text-white font-title-md text-title-md px-5 py-2.5 rounded-lg shadow-[0_4px_14px_rgba(37,99,235,0.2)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.3)] transition-all active:scale-95 whitespace-nowrap">
+<span class="material-symbols-outlined text-[20px]">person_add</span>
+                    Invite New Member
+                </button>
+</div>
+<!-- Content Area: Glassmorphic Bento Structure -->
+<div class="glass-panel rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.03)] relative overflow-hidden flex flex-col">
+<!-- Top Edge Highlight -->
+<div class="absolute inset-x-0 top-0 h-px glass-edge-top opacity-50 z-10"></div>
+<!-- Toolbar: Filters & View Toggles -->
+<div class="p-4 border-b border-outline-variant/10 flex flex-col sm:flex-row justify-between items-center gap-4 bg-surface-container-lowest/30 z-10 relative">
+<div class="flex items-center gap-2 bg-surface-container/50 p-1 rounded-lg border border-white/40">
+<button class="px-4 py-1.5 rounded-md bg-white shadow-sm font-label-md text-label-md text-on-surface transition-all">All Staff</button>
+<button class="px-4 py-1.5 rounded-md hover:bg-white/50 text-on-surface-variant font-label-md text-label-md transition-all">Admins</button>
+<button class="px-4 py-1.5 rounded-md hover:bg-white/50 text-on-surface-variant font-label-md text-label-md transition-all">Technicians</button>
+<button class="px-4 py-1.5 rounded-md hover:bg-white/50 text-on-surface-variant font-label-md text-label-md transition-all hidden sm:block">Managers</button>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-lg text-on-surface hover:bg-white/50 transition-colors border border-outline-variant/20 bg-white/20">
+<span class="material-symbols-outlined text-[20px]">filter_list</span>
+</button>
+<button class="p-2 rounded-lg text-on-surface hover:bg-white/50 transition-colors border border-outline-variant/20 bg-white/20">
+<span class="material-symbols-outlined text-[20px]">download</span>
+</button>
+</div>
+</div>
+<!-- Data Table -->
+<div class="overflow-x-auto z-10 relative">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-lowest/40 border-b border-outline-variant/20">
+<th class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider py-3 px-6 font-semibold">Member</th>
+<th class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider py-3 px-6 font-semibold">Role</th>
+<th class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider py-3 px-6 font-semibold">Status</th>
+<th class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider py-3 px-6 font-semibold hidden md:table-cell">Last Active</th>
+<th class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider py-3 px-6 font-semibold text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md text-on-surface">
+<!-- Row 1 -->
+<tr class="border-b border-outline-variant/10 hover:bg-white/30 transition-colors group h-table-row-height">
+<td class="py-2 px-6">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="Sarah Jenkins" class="w-9 h-9 rounded-full object-cover border border-white/50 shadow-sm" data-alt="A bright, cheerful portrait of a young female professional with curly hair, wearing a white blouse. The background is a soft, blurred modern office environment. The image is evenly lit with a warm, inviting tone suitable for a corporate directory." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsIUIQgC3XLVEOwTicIxi6k4ZJp99UAg4pd9WcuoDWM-9wbmXxB9hbwx_USPgoKQ5oyWk4hWkDa89RRWvmb8kS5li2fgh5cKsIHOIQOVZNKrjG4MvypR7H46mrTDtzVrxs_0nVX7aI1vnaywnJwwZnsb76llljYajaBUt-NO3V-KYlg9TpAB-jGDmpD2OaxcGktQyb0PMd7A7Rn9SB62i3uS51-G3UYNfa2FpVXH0xYRowYT1P28Su41eFMUxmtbbgjfn1-P7fdA"/>
+<div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-surface rounded-full"></div>
+</div>
+<div>
+<div class="font-title-md text-title-md text-on-surface leading-tight">Sarah Jenkins</div>
+<div class="font-body-md text-[13px] text-on-surface-variant/80">s.jenkins@fixest.com</div>
+</div>
+</div>
+</td>
+<td class="py-2 px-6">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-tertiary/10 text-tertiary border border-tertiary/20">
+                                        Admin
+                                    </span>
+</td>
+<td class="py-2 px-6">
+<span class="flex items-center gap-1.5 text-sm text-on-surface-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active
+                                    </span>
+</td>
+<td class="py-2 px-6 text-on-surface-variant hidden md:table-cell text-sm">Just now</td>
+<td class="py-2 px-6 text-right">
+<button class="text-outline hover:text-primary transition-colors p-1 rounded-full hover:bg-white/50">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="bg-white/10 border-b border-outline-variant/10 hover:bg-white/30 transition-colors group h-table-row-height">
+<td class="py-2 px-6">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="Marcus Chen" class="w-9 h-9 rounded-full object-cover border border-white/50 shadow-sm" data-alt="A professional headshot of an Asian male in his thirties, wearing a casual gray button-down shirt. The background is a clean, abstract slate color. The lighting emphasizes a sharp, focused expression, characteristic of a technical specialist or engineer." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdUytF41TxfXfWu5j1kaq3rSrIyijQIyEgJzp6_aTvC-0_Rdbju6-8--M8pUdosUPo1N4FNz1o592G5Ka671XBJjdhQ7ZjodMYPo1qKYYR3arcaGQrHc23giDOfQ68Vo5SGyj6PE2XcEVhxfJvvJv0IFMLGdT9n3DuLU_Ts_LQ47LbMvrZS4MQIOqw3CNSNxknrVpbduhsdQ4xTmgLkzHs0Fhl5l81FYcjPBjYq6DDsgDwh0RxxqAI4yxsKhN8ZXBlOvxRUIbP5Q"/>
+<div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-surface rounded-full"></div>
+</div>
+<div>
+<div class="font-title-md text-title-md text-on-surface leading-tight">Marcus Chen</div>
+<div class="font-body-md text-[13px] text-on-surface-variant/80">m.chen@fixest.com</div>
+</div>
+</div>
+</td>
+<td class="py-2 px-6">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+                                        Technician
+                                    </span>
+</td>
+<td class="py-2 px-6">
+<span class="flex items-center gap-1.5 text-sm text-on-surface-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active
+                                    </span>
+</td>
+<td class="py-2 px-6 text-on-surface-variant hidden md:table-cell text-sm">2 hours ago</td>
+<td class="py-2 px-6 text-right">
+<button class="text-outline hover:text-primary transition-colors p-1 rounded-full hover:bg-white/50">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="border-b border-outline-variant/10 hover:bg-white/30 transition-colors group h-table-row-height">
+<td class="py-2 px-6">
+<div class="flex items-center gap-3">
+<div class="relative">
+<div class="w-9 h-9 rounded-full bg-secondary-container/50 border border-secondary-container text-on-secondary-container flex items-center justify-center font-title-md text-sm shadow-sm">
+                                                ER
+                                            </div>
+<div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-outline border-2 border-surface rounded-full"></div>
+</div>
+<div>
+<div class="font-title-md text-title-md text-on-surface leading-tight">Elena Rodriguez</div>
+<div class="font-body-md text-[13px] text-on-surface-variant/80">elena.r@fixest.com</div>
+</div>
+</div>
+</td>
+<td class="py-2 px-6">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">
+                                        Manager
+                                    </span>
+</td>
+<td class="py-2 px-6">
+<span class="flex items-center gap-1.5 text-sm text-on-surface-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span> Offline
+                                    </span>
+</td>
+<td class="py-2 px-6 text-on-surface-variant hidden md:table-cell text-sm">Yesterday</td>
+<td class="py-2 px-6 text-right">
+<button class="text-outline hover:text-primary transition-colors p-1 rounded-full hover:bg-white/50">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="bg-white/10 hover:bg-white/30 transition-colors group h-table-row-height">
+<td class="py-2 px-6">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="David Kim" class="w-9 h-9 rounded-full object-cover border border-white/50 shadow-sm" data-alt="A clean, well-lit headshot of a young male with short dark hair and a light beard. He is wearing a dark blue polo shirt. The background is a soft, out-of-focus tech workshop. The overall mood is modern, professional, and slightly casual." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOvkuODBWE4nqege59o42XizWe2r8pyPvGcnW8iC5RxQMwkCa5bEmvVYw3-2zzqF6R9JI6gQV8cmvEHDvsShWHANsFg4syqul5hlgwNcOcNZkUUa65GfB9q058COCr7tXEBJcVr-06E5yetoqVOPiV7kQ31fchsRaxhFyEzpV7Kw5WAbq5XYNuDjneD7EQmkSDPVJAcp96yQpw6vRmDK9RDGvWJRNYgNaWCdAKdi7Uy8fo8JmZMHhzIuBgQCPUiYdUD03bs8KFoQ"/>
+<div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-amber-500 border-2 border-surface rounded-full"></div>
+</div>
+<div>
+<div class="font-title-md text-title-md text-on-surface leading-tight">David Kim</div>
+<div class="font-body-md text-[13px] text-on-surface-variant/80">dkim@fixest.com</div>
+</div>
+</div>
+</td>
+<td class="py-2 px-6">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+                                        Technician
+                                    </span>
+</td>
+<td class="py-2 px-6">
+<span class="flex items-center gap-1.5 text-sm text-on-surface-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Away
+                                    </span>
+</td>
+<td class="py-2 px-6 text-on-surface-variant hidden md:table-cell text-sm">45 mins ago</td>
+<td class="py-2 px-6 text-right">
+<button class="text-outline hover:text-primary transition-colors p-1 rounded-full hover:bg-white/50">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="p-4 border-t border-outline-variant/10 flex items-center justify-between bg-surface-container-lowest/30 z-10 relative">
+<span class="text-sm text-on-surface-variant">Showing 1 to 4 of 24 entries</span>
+<div class="flex items-center gap-1">
+<button class="p-1 rounded text-outline hover:bg-white/50 disabled:opacity-50"><span class="material-symbols-outlined text-[20px]">chevron_left</span></button>
+<button class="w-8 h-8 rounded bg-primary text-white font-medium text-sm flex items-center justify-center shadow-sm">1</button>
+<button class="w-8 h-8 rounded hover:bg-white/50 text-on-surface-variant font-medium text-sm flex items-center justify-center transition-colors">2</button>
+<button class="w-8 h-8 rounded hover:bg-white/50 text-on-surface-variant font-medium text-sm flex items-center justify-center transition-colors">3</button>
+<button class="p-1 rounded text-on-surface-variant hover:bg-white/50"><span class="material-symbols-outlined text-[20px]">chevron_right</span></button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>
