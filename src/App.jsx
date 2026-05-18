@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, NavLink 
 import { supabase } from './utils/supabase';
 import Login    from './pages/Login';
 import Signup   from './pages/Signup';
+import ForgotPassword from './pages/ForgotPassword';
 import Dashboard from './pages/Dashboard';
 import Bookings  from './pages/Bookings';
 import Team      from './pages/Team';
@@ -396,28 +397,11 @@ function AdminShell({ children }) {
 
 /* ── Root App ──────────────────────────────────────── */
 function App() {
-  const [session, setSession] = useState(() => {
-    const isDemo = localStorage.getItem('fixest_demo') === 'true';
-    if (isDemo) return { user: { id: 'demo-admin-id', email: 'admin@fixest.com' } };
-    return null;
-  });
-  const [role,    setRole]    = useState(() => {
-    const isDemo = localStorage.getItem('fixest_demo') === 'true';
-    if (isDemo) return 'admin';
-    return null;
-  });
-  const [loading, setLoading] = useState(() => {
-    const isDemo = localStorage.getItem('fixest_demo') === 'true';
-    return !isDemo;
-  });
+  const [session, setSession] = useState(null);
+  const [role,    setRole]    = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const isDemo = localStorage.getItem('fixest_demo') === 'true';
-    if (isDemo) {
-      setLoading(false);
-      return;
-    }
-
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session) fetchRole(session.user.id);
@@ -425,7 +409,6 @@ function App() {
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (localStorage.getItem('fixest_demo') === 'true') return;
       setSession(session);
       if (session) fetchRole(session.user.id);
       else { setRole(null); setLoading(false); }
@@ -449,7 +432,6 @@ function App() {
     return (
       <div className="loading-screen">
         <div className="flex flex-col items-center gap-3">
-          <span className="material-symbols-outlined text-[48px] animate-spin">progress_activity</span>
           Loading Fixest Admin…
         </div>
       </div>
@@ -466,6 +448,7 @@ function App() {
       <Routes>
         <Route path="/login"    element={!isAdmin ? <Login /> : <Navigate to="/" replace />} />
         <Route path="/signup"   element={!isAdmin ? <Signup /> : <Navigate to="/" replace />} />
+        <Route path="/forgot-password" element={!isAdmin ? <ForgotPassword /> : <Navigate to="/" replace />} />
         <Route path="/"         element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/bookings" element={<ProtectedRoute><Bookings  /></ProtectedRoute>} />
         <Route path="/team"     element={<ProtectedRoute><Team      /></ProtectedRoute>} />

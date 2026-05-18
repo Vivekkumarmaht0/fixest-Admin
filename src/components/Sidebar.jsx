@@ -15,7 +15,6 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
 
   const handleLogout = async () => {
-    localStorage.removeItem('fixest_demo');
     await supabase.auth.signOut();
     navigate('/login');
   };

@@ -292,13 +292,6 @@ export default function Bookings() {
           <h2 className="text-[28px] font-bold tracking-tight text-[#0b1c30] leading-tight">Manage Bookings</h2>
           <p className="text-[13px] text-[#434655] mt-0.5">{bookings.length} total repair requests</p>
         </div>
-        <button onClick={() => fetchBookings(true)} disabled={refreshing}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl glass-card text-[#004ac6] font-medium text-[13px] hover:bg-white/70 active:bg-white/90 transition-all border border-white/50 shadow-sm disabled:opacity-60">
-          <span className={`material-symbols-outlined text-[18px] ${refreshing ? 'animate-spin' : ''}`}>
-            {refreshing ? 'progress_activity' : 'sync'}
-          </span>
-          Refresh
-        </button>
       </div>
 
       {/* ── Mobile Detail Drawer — bottom sheet ── */}
@@ -367,67 +360,44 @@ export default function Bookings() {
         {/* Table Panel */}
         <div className="flex-1 bg-transparent sm:bg-white sm:glass-card rounded-none sm:rounded-2xl overflow-hidden flex flex-col min-w-0">
           
-          {/* Toolbar (Mobile matches visual design, Desktop keeps premium glass style) */}
-          <div className="bg-transparent sm:bg-white/30 border-b border-transparent sm:border-white/40 p-0 pb-3 sm:p-4 space-y-2.5 sm:space-y-3">
-            {/* Mobile-only Search Bar Row (matches image exactly) */}
-            <div className="flex sm:hidden items-center gap-2">
-              <div className="relative flex-1">
+          {/* Toolbar with responsive search + filters */}
+          <div className="bg-transparent sm:bg-white/30 border-b border-transparent sm:border-white/40 px-4 py-4 sm:px-4 sm:py-4 space-y-3">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div className="relative min-w-0">
                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#737686] text-[20px] pointer-events-none">search</span>
-                <input type="text" placeholder="Search bookings..." value={searchTerm}
+                <input type="text" placeholder="Search by name, ID, or phone…" value={searchTerm}
                   onChange={e => setSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#e2e8f0] rounded-xl text-[14px] text-[#0b1c30] placeholder:text-[#94a3b8] focus:outline-none focus:border-[#004ac6]/40 transition-colors shadow-sm" />
+                  className="glass-input w-full pl-10 pr-4 py-2.5 rounded-xl text-[14px] text-[#0b1c30] placeholder:text-[#737686]" />
               </div>
-              <button onClick={() => setShowFilters(true)}
-                className={`w-11 h-11 rounded-xl border flex items-center justify-center transition-all flex-shrink-0 shadow-sm bg-white border-[#e2e8f0] text-[#64748b] hover:bg-slate-50`}>
-                <span className="material-symbols-outlined text-[20px]">tune</span>
-              </button>
+
+              <div className="flex items-center gap-2">
+                <button onClick={() => fetchBookings(true)} disabled={refreshing}
+                  className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white border border-[#e2e8f0] text-[#004ac6] font-medium text-[13px] hover:bg-slate-50 shadow-sm transition-all disabled:opacity-60">
+                  <span className="material-symbols-outlined text-[18px]">
+                    sync
+                  </span>
+                  Refresh
+                </button>
+                <button onClick={() => setShowFilters(true)}
+                  className="sm:hidden w-11 h-11 rounded-xl border flex items-center justify-center transition-all flex-shrink-0 shadow-sm bg-white border-[#e2e8f0] text-[#64748b] hover:bg-slate-50">
+                  <span className="material-symbols-outlined text-[20px]">tune</span>
+                </button>
+              </div>
             </div>
 
-            {/* Mobile-only horizontal scrolling pills */}
-            <div className="flex sm:hidden items-center gap-2 overflow-x-auto pb-1.5 no-scrollbar -mx-4 px-4">
+            <div className="hidden sm:flex flex-wrap items-center gap-2 overflow-x-auto pb-0.5 no-scrollbar">
               {ALL_STATUSES.map(s => {
                 const count = getStatusCount(s);
                 const isSelected = statusFilter === s;
                 return (
-                  <button
-                    key={s}
-                    onClick={() => setFilter(s)}
-                    className={`px-3 py-1.5 rounded-full text-[11px] font-bold tracking-wide transition-all whitespace-nowrap border flex items-center gap-1.5 flex-shrink-0 active:scale-95
+                  <button key={s} onClick={() => setFilter(s)}
+                    className={`px-3 py-1.5 rounded-full text-[11px] font-bold tracking-wide transition-all whitespace-nowrap border flex items-center gap-1.5 flex-shrink-0
                       ${isSelected 
                         ? 'bg-[#004ac6] text-white border-[#004ac6] shadow-sm' 
-                        : 'text-[#434655] bg-white border-[#e2e8f0] hover:bg-slate-50'}`}
-                  >
+                        : 'text-[#434655] bg-white border-[#e2e8f0] hover:bg-slate-50'}`}>
                     <span>{FILTER_SHORT[s] || s}</span>
                     <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-extrabold
                       ${isSelected ? 'bg-white/20 text-white' : 'bg-[#e2e8f0] text-[#475569]'}`}>
-                      {count}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Desktop-only Search Bar */}
-            <div className="hidden sm:block relative">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#737686] text-[20px] pointer-events-none">search</span>
-              <input type="text" placeholder="Search by name, ID, or phone…" value={searchTerm}
-                onChange={e => setSearch(e.target.value)}
-                className="glass-input w-full pl-10 pr-4 py-2.5 rounded-xl text-[13px] text-[#0b1c30] placeholder:text-[#737686]" />
-            </div>
-
-            {/* Desktop-only filter pills row */}
-            <div className="hidden sm:flex items-center gap-2 overflow-x-auto pb-0.5 no-scrollbar">
-              {ALL_STATUSES.map(s => {
-                const count = getStatusCount(s);
-                return (
-                  <button key={s} onClick={() => setFilter(s)}
-                    className={`px-3 py-1.5 rounded-lg text-[11px] font-bold tracking-wider transition-all whitespace-nowrap flex-shrink-0 border flex items-center gap-1.5
-                      ${statusFilter === s 
-                        ? 'bg-[#004ac6] text-white border-[#004ac6] shadow-sm' 
-                        : 'text-[#434655] bg-white/50 border-white/50 hover:bg-white/80 active:bg-white/90'}`}>
-                    <span>{FILTER_SHORT[s] || s}</span>
-                    <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-extrabold
-                      ${statusFilter === s ? 'bg-white/20 text-white' : 'bg-[#e2e8f0] text-[#475569]'}`}>
                       {count}
                     </span>
                   </button>
@@ -440,7 +410,7 @@ export default function Bookings() {
           <div className="sm:hidden flex-1 overflow-y-auto p-0 space-y-4 bg-transparent">
             {loading ? (
               <div className="flex flex-col items-center justify-center gap-3 text-[#434655] py-16">
-                <span className="material-symbols-outlined text-[48px] text-[#004ac6] animate-spin">progress_activity</span>
+                
                 <p className="text-[14px] font-medium">Loading bookings…</p>
               </div>
             ) : filtered.length === 0 ? (
@@ -498,7 +468,6 @@ export default function Bookings() {
           <div className="hidden sm:block flex-1 overflow-auto">
             {loading ? (
               <div className="flex flex-col items-center justify-center gap-3 text-[#434655] py-16">
-                <span className="material-symbols-outlined text-[48px] text-[#004ac6] animate-spin">progress_activity</span>
                 <p className="text-[14px] font-medium">Loading bookings…</p>
               </div>
             ) : filtered.length === 0 ? (

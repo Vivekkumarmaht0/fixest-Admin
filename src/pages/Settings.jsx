@@ -18,7 +18,6 @@ export default function Settings() {
   };
 
   const handleLogout = async () => {
-    localStorage.removeItem('fixest_demo');
     await supabase.auth.signOut();
   };
 

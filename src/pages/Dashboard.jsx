@@ -57,7 +57,6 @@ export default function Dashboard() {
   if (loading) return (
     <div className="flex items-center justify-center h-[60vh]">
       <div className="flex flex-col items-center gap-3 text-[#434655]">
-        <span className="material-symbols-outlined text-[48px] text-[#004ac6] animate-spin">progress_activity</span>
         <p className="text-[14px] font-medium">Loading Dashboard…</p>
       </div>
     </div>
