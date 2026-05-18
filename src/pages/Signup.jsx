@@ -6,7 +6,6 @@ export default function Signup() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
-  const [inviteCode, setInviteCode] = useState('');
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState(null);
   const [success, setSuccess]   = useState(false);
@@ -17,14 +16,7 @@ export default function Signup() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
-    // Optional Admin Invite Code verification for high production security
-    const ADMIN_SECRET = 'FIXEST-OP-2026';
-    if (inviteCode && inviteCode.trim().toUpperCase() !== ADMIN_SECRET) {
-      setError('Invalid Admin Security Code. Please contact system administrator.');
-      setLoading(false);
-      return;
-    }
+    setSuccess(false);
 
     try {
       const { data, error: signUpError } = await supabase.auth.signUp({
@@ -33,7 +25,6 @@ export default function Signup() {
         options: {
           data: {
             full_name: fullName,
-            role: 'customer',
           }
         }
       });
@@ -42,34 +33,12 @@ export default function Signup() {
         throw signUpError;
       }
 
-      // Automatically log them in with the signup credentials
-      try {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
+      setSuccess(true);
+      setError(null);
 
-        if (signInError) {
-          if (signInError.message.toLowerCase().includes('confirm') || signInError.message.toLowerCase().includes('verified')) {
-            setError('Registration successful! Please check your email to verify/confirm your account.');
-            setSuccess(true);
-            setLoading(false);
-            return;
-          }
-          throw signInError;
-        }
-
-        localStorage.removeItem('fixest_demo');
-        setSuccess(true);
-        setTimeout(() => {
-          navigate('/');
-        }, 2500);
-      } catch (signInErr) {
-        setError('Account created, but automatic login failed: ' + signInErr.message + '. Please try signing in manually.');
-        setSuccess(true);
-        setLoading(false);
-      }
-
+      setTimeout(() => {
+        navigate('/login');
+      }, 3000);
     } catch (err) {
       setError(err.message || 'An error occurred during registration.');
     } finally {
@@ -105,7 +74,7 @@ export default function Signup() {
           {success && (
             <div className="mb-5 flex items-center gap-3 px-4 py-3 rounded-xl bg-[#e8f5e9] border border-[#2e7d32]/20 text-[#1b5e20] text-[12.5px] font-medium leading-relaxed">
               <span className="material-symbols-outlined text-[18px] flex-shrink-0">check_circle</span>
-              Registration successful! Logging you in...
+              Registration successful! Your account has been created and is pending admin promotion.
             </div>
           )}
 
@@ -178,27 +147,6 @@ export default function Signup() {
               </div>
             </div>
 
-            {/* Invite/Security Code */}
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="text-[12px] font-medium text-[#434655] tracking-wide">Admin Invite Code</label>
-                <span className="text-[10px] text-[#737686] font-medium italic">Required for protection</span>
-              </div>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#737686] text-[19px] pointer-events-none">
-                  vpn_key
-                </span>
-                <input
-                  type="text"
-                  value={inviteCode}
-                  onChange={(e) => setInviteCode(e.target.value)}
-                  placeholder="FIXEST-OP-2026"
-                  required
-                  className="glass-input w-full pl-10 pr-4 py-2 rounded-xl text-[13.5px] text-[#0b1c30] placeholder:text-[#737686]"
-                />
-              </div>
-            </div>
-
             {/* Buttons */}
             <div className="pt-2">
               <button
@@ -208,7 +156,6 @@ export default function Signup() {
               >
                 {loading ? (
                   <>
-                    <span className="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>
                     Registering…
                   </>
                 ) : (

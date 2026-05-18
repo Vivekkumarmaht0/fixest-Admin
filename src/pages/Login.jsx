@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { supabase } from '../utils/supabase';
 
 export default function Login() {
@@ -7,7 +7,9 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState(null);
+  const [infoMessage, setInfoMessage] = useState(null);
   const [showPass, setShowPass] = useState(false);
+  const location = useLocation();
 
   // Operator Authorization checks
   const [currentUser, setCurrentUser] = useState(null);
@@ -15,6 +17,11 @@ export default function Login() {
   const [checkLoading, setCheckLoading] = useState(true);
 
   useEffect(() => {
+    if (location.state?.resetSuccess) {
+      setInfoMessage('Password reset email sent. Please check your inbox.');
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     const checkUserSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -45,16 +52,21 @@ export default function Login() {
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       setError(error.message);
       setLoading(false);
-    } else {
-      // Re-trigger auth verification
-      localStorage.removeItem('fixest_demo');
-      window.location.reload();
+      return;
     }
+
+    if (!data?.session) {
+      setError('Unable to sign in. Please verify your email and password and try again.');
+      setLoading(false);
+      return;
+    }
+
+    window.location.reload();
   };
 
   const handleSignOut = async () => {
@@ -87,6 +99,12 @@ export default function Login() {
 
         {/* Glass Card */}
         <div className="glass-panel rounded-2xl p-5 sm:p-8 shadow-2xl">
+          {infoMessage && !error && (
+            <div className="mb-5 flex items-center gap-3 px-4 py-3 rounded-xl bg-[#e8f5e9] border border-[#2e7d32]/20 text-[#1b5e20] text-[13px] font-medium leading-relaxed">
+              <span className="material-symbols-outlined text-[18px] flex-shrink-0">check_circle</span>
+              {infoMessage}
+            </div>
+          )}
           {error && (
             <div className="mb-5 flex items-center gap-3 px-4 py-3 rounded-xl bg-[#ffdad6] border border-[#ba1a1a]/20 text-[#93000a] text-[13px] font-medium animate-shake">
               <span className="material-symbols-outlined text-[18px] flex-shrink-0">error</span>
@@ -96,7 +114,6 @@ export default function Login() {
 
           {checkLoading ? (
             <div className="py-12 flex flex-col items-center justify-center text-center">
-              <span className="material-symbols-outlined text-[36px] animate-spin text-[#004ac6] mb-3">progress_activity</span>
               <p className="text-[13px] font-semibold text-[#737686]">Checking operator authorization...</p>
             </div>
           ) : pendingApproval ? (
@@ -168,9 +185,9 @@ export default function Login() {
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="text-[12px] font-medium text-[#434655] tracking-wide">Password</label>
-                    <a href="#" className="text-[12px] text-[#004ac6] hover:text-[#2563eb] transition-colors font-medium">
+                    <Link to="/forgot-password" className="text-[12px] text-[#004ac6] hover:text-[#2563eb] transition-colors font-medium">
                       Forgot Password?
-                    </a>
+                    </Link>
                   </div>
                   <div className="relative">
                     <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#737686] text-[20px] pointer-events-none">
@@ -204,7 +221,6 @@ export default function Login() {
                   >
                     {loading ? (
                       <>
-                        <span className="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>
                         Signing in…
                       </>
                     ) : (
@@ -215,17 +231,6 @@ export default function Login() {
                     )}
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      localStorage.setItem('fixest_demo', 'true');
-                      window.location.reload();
-                    }}
-                    className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-[14px] text-[#004ac6] bg-[#004ac6]/10 hover:bg-[#004ac6]/20 border border-[#004ac6]/20 hover:border-[#004ac6]/40 transition-all active:scale-[0.98] shadow-sm cursor-pointer"
-                  >
-                    <span className="material-symbols-outlined text-[19px]">bolt</span>
-                    Quick Demo Access
-                  </button>
                 </div>
               </form>
 
