@@ -54,8 +54,34 @@ function AdminShell({ children }) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [activeToast, setActiveToast] = useState(null);
+  const [profile, setProfile] = useState({ name: 'Admin', initial: 'A' });
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const location = useLocation();
   const page = PAGE_LABELS[location.pathname] || { title: 'Dashboard', icon: 'dashboard' };
+
+  const fetchProfile = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      const { data } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .maybeSingle();
+        
+      if (data && data.full_name) {
+        const name = data.full_name;
+        const initial = name.charAt(0).toUpperCase();
+        setProfile({ name, initial });
+      } else if (user.email) {
+        const emailName = user.email.split('@')[0];
+        setProfile({ name: emailName, initial: emailName.charAt(0).toUpperCase() });
+      }
+    } catch (err) {
+      console.error('Error fetching profile in AdminShell:', err);
+    }
+  };
 
   const fetchNotifications = async () => {
     try {
@@ -82,6 +108,7 @@ function AdminShell({ children }) {
     }
 
     fetchNotifications();
+    fetchProfile();
 
     const channel = supabase
       .channel('realtime-notifications')
@@ -149,6 +176,17 @@ function AdminShell({ children }) {
     document.addEventListener('click', handleOutsideClick);
     return () => document.removeEventListener('click', handleOutsideClick);
   }, [dropdownOpen]);
+
+  useEffect(() => {
+    if (!profileDropdownOpen) return;
+    const handleOutsideClick = (e) => {
+      if (!e.target.closest('.profile-container')) {
+        setProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener('click', handleOutsideClick);
+    return () => document.removeEventListener('click', handleOutsideClick);
+  }, [profileDropdownOpen]);
 
   const markAsRead = async (id) => {
     try {
@@ -248,7 +286,7 @@ function AdminShell({ children }) {
               </button>
 
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2.5 w-[320px] md:w-[380px] bg-white border border-[#c3c6d7]/30 shadow-2xl rounded-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-3 duration-200">
+                <div className="fixed md:absolute top-16 md:top-auto right-4 left-4 md:right-0 md:left-auto mt-2.5 md:w-[380px] w-auto bg-white border border-[#c3c6d7]/30 shadow-2xl rounded-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-3 duration-200">
                   {/* Dropdown Header */}
                   <div className="px-4 py-3 border-b border-[#c3c6d7]/20 flex items-center justify-between bg-slate-50/50">
                     <span className="font-bold text-[14px] text-[#0b1c30]">Notifications</span>
@@ -313,12 +351,44 @@ function AdminShell({ children }) {
             </div>
 
             <div className="h-7 w-px bg-[#c3c6d7]/50 mx-1 hidden lg:block" />
-            <div className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full hover:bg-white/50 transition-all cursor-pointer border border-transparent hover:border-white/50">
-              <div className="w-9 h-9 rounded-full bg-[#004ac6] flex items-center justify-center text-white text-[14px] font-bold shadow-sm">
-                A
-              </div>
-              <span className="text-[13px] font-medium text-[#0b1c30] hidden lg:block">Admin</span>
-              <span className="material-symbols-outlined text-[#737686] text-[18px] hidden lg:block">expand_more</span>
+            
+            {/* Profile Dropdown Container */}
+            <div className="relative profile-container flex items-center">
+              <button 
+                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full hover:bg-white/50 transition-all border border-transparent hover:border-white/50 focus:outline-none"
+              >
+                <div className="w-9 h-9 rounded-full bg-[#004ac6] flex items-center justify-center text-white text-[14px] font-bold shadow-sm uppercase shrink-0">
+                  {profile.initial}
+                </div>
+                <span className="text-[13px] font-medium text-[#0b1c30] hidden lg:block">{profile.name}</span>
+                <span className="material-symbols-outlined text-[#737686] text-[18px] hidden lg:block">
+                  {profileDropdownOpen ? 'expand_less' : 'expand_more'}
+                </span>
+              </button>
+
+              {profileDropdownOpen && (
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-[#c3c6d7]/30 shadow-2xl rounded-2xl z-50 overflow-hidden py-1 animate-in fade-in slide-in-from-top-3 duration-200">
+                  <NavLink 
+                    to="/settings"
+                    onClick={() => setProfileDropdownOpen(false)}
+                    className="flex items-center gap-2.5 px-4 py-2.5 text-[13px] text-[#434655] hover:bg-slate-50 hover:text-[#0b1c30] transition-all font-semibold"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">settings</span>
+                    Settings
+                  </NavLink>
+                  <button 
+                    onClick={async () => {
+                      setProfileDropdownOpen(false);
+                      await supabase.auth.signOut();
+                    }}
+                    className="flex items-center gap-2.5 w-full text-left px-4 py-2.5 text-[13px] text-[#ba1a1a] hover:bg-red-50 transition-all font-semibold"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">logout</span>
+                    Logout
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </header>

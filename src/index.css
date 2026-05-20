@@ -8,6 +8,12 @@
 /* ─── Design System: Base Reset ───────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Hide default browser password reveal and clear buttons in IE/Edge */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+
 html, body, #root {
   height: 100%;
   font-family: 'Geist', system-ui, -apple-system, sans-serif;
