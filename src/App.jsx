@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, NavLink } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, NavLink, useNavigate } from 'react-router-dom';
 import { supabase } from './utils/supabase';
 import Login    from './pages/Login';
 import Signup   from './pages/Signup';
@@ -61,6 +61,7 @@ function AdminShell({ children }) {
   const [profile, setProfile] = useState({ name: 'Admin', initial: 'A' });
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const page = PAGE_LABELS[location.pathname] || { title: 'Dashboard', icon: 'dashboard' };
 
   const fetchProfile = async () => {
@@ -226,6 +227,17 @@ function AdminShell({ children }) {
     }
   };
 
+  const handleNotificationClick = (n) => {
+    markAsRead(n.id);
+    const match = (n.message + " " + (n.title || '')).match(/FIX-[A-Z0-9]+/i);
+    if (match) {
+      navigate('/bookings', { state: { searchBookingId: match[0] } });
+    } else if (n.type === 'new_booking') {
+      navigate('/bookings');
+    }
+    setDropdownOpen(false);
+  };
+
   function timeAgo(dateStr) {
     const now = new Date();
     const past = new Date(dateStr);
@@ -318,7 +330,7 @@ function AdminShell({ children }) {
                         return (
                           <div 
                             key={n.id}
-                            onClick={() => markAsRead(n.id)}
+                            onClick={() => handleNotificationClick(n)}
                             className={`p-3.5 flex items-start gap-3 hover:bg-slate-50 transition-all cursor-pointer relative ${!n.is_read ? 'bg-[#004ac6]/5' : ''}`}
                           >
                             {/* Icon */}
@@ -445,7 +457,10 @@ function AdminShell({ children }) {
 
       {/* Premium Visual Toast Notification */}
       {activeToast && (
-        <div className="fixed top-4 right-4 z-[9999] max-w-[360px] w-full bg-white/95 backdrop-blur-lg border border-[#004ac6]/20 shadow-[0_20px_50px_rgba(0,74,198,0.15)] rounded-2xl p-4 flex items-start gap-3.5 transition-all duration-300 animate-in fade-in slide-in-from-top-5 select-none">
+        <div 
+          onClick={() => { handleNotificationClick(activeToast); setActiveToast(null); }}
+          className="fixed top-4 right-4 z-[9999] max-w-[360px] w-full bg-white/95 backdrop-blur-lg border border-[#004ac6]/20 shadow-[0_20px_50px_rgba(0,74,198,0.15)] rounded-2xl p-4 flex items-start gap-3.5 transition-all duration-300 animate-in fade-in slide-in-from-top-5 cursor-pointer"
+        >
           <div className="w-10 h-10 rounded-full bg-[#004ac6] flex items-center justify-center text-white shrink-0 shadow-md animate-bounce">
             <span className="material-symbols-outlined text-[20px]">notifications_active</span>
           </div>
@@ -454,7 +469,7 @@ function AdminShell({ children }) {
               <h4 className="font-extrabold text-[13px] text-[#0b1c30] leading-tight">
                 {activeToast.title}
               </h4>
-              <button onClick={() => setActiveToast(null)} className="text-slate-400 hover:text-slate-600 transition-colors shrink-0">
+              <button onClick={(e) => { e.stopPropagation(); setActiveToast(null); }} className="text-slate-400 hover:text-slate-600 transition-colors shrink-0">
                 <span className="material-symbols-outlined text-[16px]">close</span>
               </button>
             </div>

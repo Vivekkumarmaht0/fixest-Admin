@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { useLocation } from 'react-router-dom';
 import { supabase } from '../utils/supabase';
 
 const ALL_STATUSES = ['All', 'Booking Received', 'Awaiting Customer Approval', 'Repair Approved', 'Device Picked Up', 'Diagnosing', 'Repaired', 'Out for Delivery', 'Delivered', 'Cancelled'];
@@ -384,6 +385,7 @@ function DetailPanel({ selected, onClose, updating, onUpdateStatus, repairCostIn
    Bookings page
    ───────────────────────────────────────────────────────────── */
 export default function Bookings() {
+  const location = useLocation();
   const [bookings, setBookings]     = useState([]);
   const [loading, setLoading]       = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -403,6 +405,22 @@ export default function Bookings() {
   };
 
   useEffect(() => { fetchBookings(); }, []);
+
+  useEffect(() => {
+    if (bookings.length > 0 && location.state?.searchBookingId) {
+      const targetId = location.state.searchBookingId.toUpperCase();
+      const b = bookings.find(x => formatBookingId(x) === targetId || x.service_id?.toUpperCase() === targetId || x.id.toUpperCase() === targetId);
+      if (b) {
+        setSelected(b);
+        setShowDetail(true);
+        setSearch(targetId);
+        setFilter('All');
+        setRepairCostInput(b.final_repair_cost ? String(b.final_repair_cost) : '');
+        // Clean up state
+        window.history.replaceState({}, document.title);
+      }
+    }
+  }, [bookings, location.state]);
 
   useEffect(() => {
     if (showDetail && window.innerWidth < 1024) {
