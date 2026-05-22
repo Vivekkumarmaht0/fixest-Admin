@@ -9,6 +9,7 @@ import Bookings  from './pages/Bookings';
 import Team      from './pages/Team';
 import Settings  from './pages/Settings';
 import Sidebar   from './components/Sidebar';
+import CookieConsent from './components/CookieConsent';
 
 /* ── Page title lookup ─────────────────────────────── */
 const PAGE_LABELS = {
@@ -17,6 +18,9 @@ const PAGE_LABELS = {
   '/team':     { title: 'Team',        icon: 'group'      },
   '/settings': { title: 'Settings',    icon: 'settings'   },
 };
+
+const ProtectedRoute = ({ children, isAdmin }) =>
+  isAdmin ? <AdminShell>{children}</AdminShell> : <Navigate to="/login" replace />;
 
 /* ── Authenticated shell with sidebar + header ─────── */
 function playNotificationChime() {
@@ -154,7 +158,7 @@ function AdminShell({ children }) {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      channel.unsubscribe();
     };
   }, []);
 
@@ -510,21 +514,19 @@ function App() {
 
   const isAdmin = session && (role === 'admin' || role === 'staff');
 
-  const ProtectedRoute = ({ children }) =>
-    isAdmin ? <AdminShell>{children}</AdminShell> : <Navigate to="/login" replace />;
-
   return (
     <Router>
       <Routes>
         <Route path="/login"    element={!isAdmin ? <Login /> : <Navigate to="/" replace />} />
         <Route path="/signup"   element={!isAdmin ? <Signup /> : <Navigate to="/" replace />} />
         <Route path="/forgot-password" element={!isAdmin ? <ForgotPassword /> : <Navigate to="/" replace />} />
-        <Route path="/"         element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/bookings" element={<ProtectedRoute><Bookings  /></ProtectedRoute>} />
-        <Route path="/team"     element={<ProtectedRoute><Team      /></ProtectedRoute>} />
-        <Route path="/settings" element={<ProtectedRoute><Settings  /></ProtectedRoute>} />
+        <Route path="/"         element={<ProtectedRoute isAdmin={isAdmin}><Dashboard /></ProtectedRoute>} />
+        <Route path="/bookings" element={<ProtectedRoute isAdmin={isAdmin}><Bookings  /></ProtectedRoute>} />
+        <Route path="/team"     element={<ProtectedRoute isAdmin={isAdmin}><Team      /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute isAdmin={isAdmin}><Settings  /></ProtectedRoute>} />
         <Route path="*"         element={<Navigate to="/" replace />} />
       </Routes>
+      <CookieConsent />
     </Router>
   );
 }

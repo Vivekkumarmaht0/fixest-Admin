@@ -78,7 +78,14 @@ function getMobileStatusStyle(status = '') {
    DetailPanel — defined OUTSIDE Bookings to prevent remounting
    on every parent state change (e.g. repairCostInput keystrokes)
    ───────────────────────────────────────────────────────────── */
-function DetailPanel({ selected, onClose, updating, onUpdateStatus, repairCostInput, onRepairCostChange, savingCost, costSaved, onSaveRepairCost, onMarkPaidCod }) {
+function DetailPanel({ selected, onClose, updating, onUpdateStatus, repairCostInput, onRepairCostChange, savingCost, costSaved, onSaveRepairCost, onMarkPaidCod, onProcessRefund }) {
+  const [copied, setCopied] = React.useState(false);
+
+  const handleCopyId = () => {
+    navigator.clipboard.writeText(formatBookingId(selected));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
   return (
     <div className="flex flex-col h-full bg-[#f1f5f9] select-none text-left">
       {/* Drawer drag handle */}
@@ -87,10 +94,21 @@ function DetailPanel({ selected, onClose, updating, onUpdateStatus, repairCostIn
       {/* Header */}
       <div className="px-5 pb-4 flex items-start justify-between flex-shrink-0 bg-transparent">
         <div>
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-[#e5eeff] text-[#004ac6]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#004ac6] animate-pulse" />
-            {formatBookingId(selected)}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-[#e5eeff] text-[#004ac6]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#004ac6] animate-pulse" />
+              {formatBookingId(selected)}
+            </span>
+            <button
+              onClick={handleCopyId}
+              className="text-[#004ac6] hover:bg-[#e5eeff] p-1 rounded-md transition-all flex items-center justify-center"
+              title="Copy ID"
+            >
+              <span className="material-symbols-outlined text-[14px]">
+                {copied ? 'check' : 'content_copy'}
+              </span>
+            </button>
+          </div>
           <h2 className="text-[21px] font-extrabold text-slate-900 mt-1.5 leading-tight tracking-tight">
             {selected.brand} {selected.model}
           </h2>
@@ -107,20 +125,35 @@ function DetailPanel({ selected, onClose, updating, onUpdateStatus, repairCostIn
         {/* CUSTOMER */}
         <div>
           <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">Customer</p>
-          <div className="bg-white rounded-2xl p-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-12 h-12 rounded-full bg-[#d3e4fe] flex items-center justify-center text-[15px] font-extrabold text-[#004ac6] shadow-sm flex-shrink-0">
-                {initials(selected.full_name)}
+          <div className="bg-white rounded-2xl p-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col gap-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-12 h-12 rounded-full bg-[#d3e4fe] flex items-center justify-center text-[15px] font-extrabold text-[#004ac6] shadow-sm flex-shrink-0">
+                  {initials(selected.full_name)}
+                </div>
+                <div className="min-w-0">
+                  <h4 className="font-bold text-[15px] text-slate-900 leading-tight truncate">{selected.full_name}</h4>
+                  <p className="text-slate-500 text-[12px] font-medium mt-0.5 truncate">{selected.phone_number}</p>
+                </div>
               </div>
-              <div className="min-w-0">
-                <h4 className="font-bold text-[15px] text-slate-900 leading-tight truncate">{selected.full_name}</h4>
-                <p className="text-slate-500 text-[12px] font-medium mt-0.5 truncate">{selected.phone_number}</p>
-              </div>
+              <a href={`tel:${selected.phone_number}`}
+                className="w-10 h-10 rounded-full bg-[#004ac6] hover:bg-[#003cb0] hover:scale-105 active:scale-95 text-white flex items-center justify-center shadow-sm transition-all flex-shrink-0">
+                <span className="material-symbols-outlined text-[19px] icon-fill">phone</span>
+              </a>
             </div>
-            <a href={`tel:${selected.phone_number}`}
-              className="w-10 h-10 rounded-full bg-[#004ac6] hover:bg-[#003cb0] hover:scale-105 active:scale-95 text-white flex items-center justify-center shadow-sm transition-all flex-shrink-0">
-              <span className="material-symbols-outlined text-[19px] icon-fill">phone</span>
-            </a>
+            {(selected.house_no || selected.area || selected.city) && (
+              <div className="pt-3 border-t border-slate-100 flex items-start gap-2">
+                <span className="material-symbols-outlined text-[18px] text-slate-400 mt-0.5 flex-shrink-0">location_on</span>
+                <a 
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${selected.house_no || ''}, ${selected.area || ''}, ${selected.city || ''}, ${selected.pincode || ''}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[12px] text-slate-600 font-medium hover:text-[#004ac6] hover:underline"
+                >
+                  {[selected.house_no, selected.area, selected.city].filter(Boolean).join(', ')} {selected.pincode ? `- ${selected.pincode}` : ''}
+                </a>
+              </div>
+            )}
           </div>
         </div>
 
@@ -212,6 +245,16 @@ function DetailPanel({ selected, onClose, updating, onUpdateStatus, repairCostIn
                 >
                   <span className="material-symbols-outlined text-[13px]">payments</span>
                   Mark Paid (COD)
+                </button>
+              )}
+              {selected.final_payment_status === 'paid' && (
+                <button
+                  onClick={() => onProcessRefund()}
+                  disabled={updating}
+                  className="mt-1 flex items-center justify-center gap-1 w-full py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 text-[10px] font-bold transition-all disabled:opacity-50"
+                >
+                  <span className="material-symbols-outlined text-[13px]">currency_exchange</span>
+                  Process Refund
                 </button>
               )}
             </div>
@@ -462,6 +505,35 @@ export default function Bookings() {
     }
   }, [selected]);
 
+  const processRefund = useCallback(async () => {
+    if (!selected) return;
+    const reason = prompt("Enter reason for refund (optional):");
+    if (reason === null) return; // user cancelled prompt
+    
+    setUpdating(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await fetch(`https://wpwmmlkowxxbwpoeullq.supabase.co/functions/v1/issue-refund`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
+        body: JSON.stringify({ booking_id: selected.id, reason })
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Failed to process refund");
+
+      alert("Refund processed successfully!");
+      fetchBookings(true);
+    } catch (err) {
+      alert("Refund error: " + err.message);
+    } finally {
+      setUpdating(false);
+    }
+  }, [selected]);
+
   const filtered = bookings.filter(b => {
     const q = searchTerm.toLowerCase();
     return (
@@ -483,6 +555,7 @@ export default function Bookings() {
     costSaved,
     onSaveRepairCost: saveRepairCost,
     onMarkPaidCod: markPaidCod,
+    onProcessRefund: processRefund,
   };
 
   return (
