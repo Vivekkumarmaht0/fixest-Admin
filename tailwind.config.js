@@ -81,7 +81,7 @@ export default {
           "label-md": ["Geist"],
           "headline-md": ["Geist"]
       },
-      "fontSize": {
+      fontSize: {
           "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
           "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
           "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
@@ -91,6 +91,14 @@ export default {
           "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
           "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
           "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }]
+      },
+      keyframes: {
+        shimmer: {
+          '100%': { transform: 'translateX(100%)' },
+        },
+      },
+      animation: {
+        shimmer: 'shimmer 1.5s infinite',
       }
     },
   },

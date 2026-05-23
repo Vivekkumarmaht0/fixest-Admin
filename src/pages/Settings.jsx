@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabase';
+import { SkeletonCard } from '../components/ui/SkeletonVariants';
 
 export default function Settings() {
   const [firstName, setFirstName] = useState('');
@@ -77,9 +78,21 @@ export default function Settings() {
 
   if (loading) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-12">
-        <div className="w-8 h-8 border-4 border-[#004ac6]/20 border-t-[#004ac6] rounded-full animate-spin mb-4"></div>
-        <p className="text-[13px] font-medium text-[#434655]">Loading settings...</p>
+      <div className="space-y-6 animate-in fade-in duration-300">
+        <div>
+          <h2 className="text-[28px] font-bold tracking-tight text-[#0b1c30]">Account Settings</h2>
+          <p className="text-[13px] text-[#434655]">Loading settings...</p>
+        </div>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div className="xl:col-span-2 space-y-6">
+            <SkeletonCard />
+            <SkeletonCard />
+          </div>
+          <div className="space-y-6">
+            <SkeletonCard />
+            <SkeletonCard />
+          </div>
+        </div>
       </div>
     );
   }

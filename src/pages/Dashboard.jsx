@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabase';
 import { useNavigate } from 'react-router-dom';
+import { SkeletonDashboardStats, SkeletonTable } from '../components/ui/SkeletonVariants';
 
 const STATUS_BADGE = {
   'Booking Received': 'bg-[#d3e4fe] text-[#0b1c30] border-[#c3c6d7]/30',
@@ -55,9 +56,15 @@ export default function Dashboard() {
   };
 
   if (loading) return (
-    <div className="flex items-center justify-center h-[60vh]">
-      <div className="flex flex-col items-center gap-3 text-[#434655]">
-        <p className="text-[14px] font-medium">Loading Dashboard…</p>
+    <div className="space-y-6 animate-in fade-in duration-300">
+      <div>
+        <h2 className="text-[28px] font-bold tracking-tight text-[#0b1c30]">Dashboard Overview</h2>
+        <p className="text-[13px] text-[#434655]">Loading real-time metrics...</p>
+      </div>
+      <SkeletonDashboardStats count={4} />
+      <div className="glass-card rounded-2xl p-5">
+        <h3 className="text-[18px] font-semibold text-[#0b1c30] mb-4">Recent Activity</h3>
+        <SkeletonTable columns={5} rows={4} />
       </div>
     </div>
   );

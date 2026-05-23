@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabase';
+import { SkeletonTable, SkeletonCard } from '../components/ui/SkeletonVariants';
 
 const ROLE_BADGE = {
   admin:      'bg-[#e5eeff] text-[#004ac6] border-[#004ac6]/20',
@@ -136,10 +137,16 @@ export default function Team() {
         </div>
 
         {loading ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-12">
-            <div className="w-8 h-8 border-4 border-[#004ac6]/20 border-t-[#004ac6] rounded-full animate-spin mb-4"></div>
-            <p className="text-[13px] font-medium text-[#434655]">Loading team members...</p>
-          </div>
+          <>
+            <div className="sm:hidden space-y-4 p-4">
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+            </div>
+            <div className="hidden sm:block p-4">
+              <SkeletonTable columns={5} rows={5} />
+            </div>
+          </>
         ) : (
           <>
             {/* ── Mobile: Card-based member list (< sm) ── */}

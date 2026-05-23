@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '../utils/supabase';
+import { SkeletonTable, SkeletonCard } from '../components/ui/SkeletonVariants';
 
 const ALL_STATUSES = ['All', 'Booking Received', 'Awaiting Customer Approval', 'Repair Approved', 'Device Picked Up', 'Diagnosing', 'Repaired', 'Out for Delivery', 'Delivered', 'Cancelled'];
 const UPDATE_STATUSES = ALL_STATUSES.slice(1);
@@ -679,8 +680,10 @@ export default function Bookings() {
           {/* Mobile card list */}
           <div className="sm:hidden flex-1 overflow-y-auto p-0 space-y-4 bg-transparent">
             {loading ? (
-              <div className="flex flex-col items-center justify-center gap-3 text-[#434655] py-16">
-                <p className="text-[14px] font-medium">Loading bookings…</p>
+              <div className="space-y-4 px-2">
+                <SkeletonCard />
+                <SkeletonCard />
+                <SkeletonCard />
               </div>
             ) : filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center gap-3 text-[#434655] py-16 bg-white rounded-2xl p-4 border border-[#e2e8f0] shadow-sm">
@@ -719,8 +722,8 @@ export default function Bookings() {
           {/* Desktop table */}
           <div className="hidden sm:block flex-1 overflow-auto">
             {loading ? (
-              <div className="flex flex-col items-center justify-center gap-3 text-[#434655] py-16">
-                <p className="text-[14px] font-medium">Loading bookings…</p>
+              <div className="p-4">
+                <SkeletonTable columns={6} rows={5} />
               </div>
             ) : filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center gap-3 text-[#434655] py-16">
