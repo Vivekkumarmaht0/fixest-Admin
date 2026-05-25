@@ -134,14 +134,27 @@ function AdminShell({ children }) {
 
           // 2. Trigger native OS/Phone browser notification popup
           if ('Notification' in window && Notification.permission === 'granted') {
-            try {
-              new Notification(payload.new.title, {
-                body: payload.new.message,
-                tag: payload.new.id,
-                requireInteraction: false
+            const title = payload.new.title;
+            const options = {
+              body: payload.new.message,
+              tag: payload.new.id,
+              icon: '/pwa-192.png',
+              badge: '/favicon.svg',
+              requireInteraction: false,
+              data: { url: '/bookings' }
+            };
+
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.ready.then(registration => {
+                registration.showNotification(title, options).catch(swErr => {
+                  console.error('SW notification error, falling back:', swErr);
+                  try { new Notification(title, options); } catch (e) { }
+                });
               });
-            } catch (err) {
-              console.error('System notification error:', err);
+            } else {
+              try { new Notification(title, options); } catch (err) {
+                console.error('System notification error:', err);
+              }
             }
           }
 
