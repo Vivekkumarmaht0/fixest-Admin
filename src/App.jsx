@@ -141,6 +141,8 @@ function AdminShell({ children }) {
               icon: '/pwa-192.png',
               badge: '/favicon.svg',
               requireInteraction: false,
+              vibrate: [200, 100, 200, 100, 200, 100, 200],
+              silent: false,
               data: { url: '/bookings' }
             };
 
