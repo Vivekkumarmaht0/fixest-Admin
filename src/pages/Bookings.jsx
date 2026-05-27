@@ -80,7 +80,7 @@ function getMobileStatusStyle(status = '') {
    DetailPanel — defined OUTSIDE Bookings to prevent remounting
    on every parent state change (e.g. repairCostInput keystrokes)
    ───────────────────────────────────────────────────────────── */
-function DetailPanel({ selected, onClose, updating, onUpdateStatus, repairCostInput, onRepairCostChange, savingCost, costSaved, onSaveRepairCost, onMarkPaidCod, onProcessRefund }) {
+function DetailPanel({ selected, onClose, updating, onUpdateStatus, repairCostInput, onRepairCostChange, savingCost, costSaved, onSaveRepairCost, onMarkPaid, onProcessRefund }) {
   const [copied, setCopied] = React.useState(false);
 
   const handleCopyId = () => {
@@ -208,14 +208,24 @@ function DetailPanel({ selected, onClose, updating, onUpdateStatus, repairCostIn
                 <p className="text-[11px] text-slate-500 font-semibold">₹{selected.booking_fee || 197}</p>
               )}
               {selected.advance_payment_status !== 'paid' && selected.payment_mode === 'COD' && (
-                <button
-                  onClick={() => onMarkPaidCod('advance')}
-                  disabled={updating}
-                  className="mt-1 flex items-center justify-center gap-1 w-full py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-800 text-[10px] font-bold transition-all disabled:opacity-50"
-                >
-                  <span className="material-symbols-outlined text-[13px]">payments</span>
-                  Mark Paid (COD)
-                </button>
+                <div className="mt-1 flex flex-col gap-1">
+                  <button
+                    onClick={() => onMarkPaid('advance', 'cod')}
+                    disabled={updating}
+                    className="flex items-center justify-center gap-1 w-full py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-800 text-[10px] font-bold transition-all disabled:opacity-50"
+                  >
+                    <span className="material-symbols-outlined text-[13px]">payments</span>
+                    Mark Paid (COD)
+                  </button>
+                  <button
+                    onClick={() => onMarkPaid('advance', 'upi')}
+                    disabled={updating}
+                    className="flex items-center justify-center gap-1 w-full py-1.5 rounded-lg bg-green-100 hover:bg-green-200 text-green-800 text-[10px] font-bold transition-all disabled:opacity-50"
+                  >
+                    <span className="material-symbols-outlined text-[13px]">account_balance_wallet</span>
+                    Mark Paid (Online)
+                  </button>
+                </div>
               )}
               <p className="text-[10px] text-slate-400 mt-0.5">
                 {selected.payment_mode === 'COD' ? '💵 COD booking' : '💳 Online booking'}
@@ -240,14 +250,24 @@ function DetailPanel({ selected, onClose, updating, onUpdateStatus, repairCostIn
                 <p className="text-[11px] text-slate-500 font-semibold">₹{selected.final_repair_cost}</p>
               )}
               {selected.final_repair_cost > 0 && selected.final_payment_status !== 'paid' && (
-                <button
-                  onClick={() => onMarkPaidCod('repair')}
-                  disabled={updating}
-                  className="mt-1 flex items-center justify-center gap-1 w-full py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-[10px] font-bold transition-all disabled:opacity-50"
-                >
-                  <span className="material-symbols-outlined text-[13px]">payments</span>
-                  Mark Paid (COD)
-                </button>
+                <div className="mt-1 flex flex-col gap-1">
+                  <button
+                    onClick={() => onMarkPaid('repair', 'cod')}
+                    disabled={updating}
+                    className="flex items-center justify-center gap-1 w-full py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-[10px] font-bold transition-all disabled:opacity-50"
+                  >
+                    <span className="material-symbols-outlined text-[13px]">payments</span>
+                    Mark Paid (COD)
+                  </button>
+                  <button
+                    onClick={() => onMarkPaid('repair', 'upi')}
+                    disabled={updating}
+                    className="flex items-center justify-center gap-1 w-full py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[10px] font-bold transition-all disabled:opacity-50"
+                  >
+                    <span className="material-symbols-outlined text-[13px]">account_balance_wallet</span>
+                    Mark Paid (Online)
+                  </button>
+                </div>
               )}
               {selected.final_payment_status === 'paid' && (
                 <button
@@ -502,15 +522,16 @@ export default function Bookings() {
     setShowDetail(false);
   }, []);
 
-  const markPaidCod = useCallback(async (type) => {
+  const markPaid = useCallback(async (type, method) => {
     if (!selected) return;
-    if (!confirm(`Are you sure you want to mark the ${type} payment as Received (COD)?`)) return;
+    const methodDisplay = method === 'upi' ? 'Online/UPI' : 'COD';
+    if (!confirm(`Are you sure you want to mark the ${type} payment as Received (${methodDisplay})?`)) return;
     
     setUpdating(true);
     try {
       const payload = type === 'advance' 
-        ? { advance_payment_status: 'paid', payment_method: 'cod' }
-        : { final_payment_status: 'paid', final_payment_method: 'cod', status: 'Final Payment Received' };
+        ? { advance_payment_status: 'paid', payment_mode: method === 'upi' ? 'Prepaid' : 'COD' }
+        : { final_payment_status: 'paid', final_payment_method: method, status: 'Final Payment Received' };
 
       const { error } = await supabase.from('bookings').update(payload).eq('id', selected.id);
       if (error) throw error;
@@ -583,7 +604,7 @@ export default function Bookings() {
     savingCost,
     costSaved,
     onSaveRepairCost: saveRepairCost,
-    onMarkPaidCod: markPaidCod,
+    onMarkPaid: markPaid,
     onProcessRefund: processRefund,
   };
 
