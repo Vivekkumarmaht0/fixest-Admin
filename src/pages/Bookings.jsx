@@ -82,12 +82,20 @@ function getMobileStatusStyle(status = '') {
    ───────────────────────────────────────────────────────────── */
 function DetailPanel({ selected, onClose, updating, onUpdateStatus, repairCostInput, onRepairCostChange, savingCost, costSaved, onSaveRepairCost, onMarkPaid, onProcessRefund }) {
   const [copied, setCopied] = React.useState(false);
+  const [phoneCopied, setPhoneCopied] = React.useState(false);
 
   const handleCopyId = () => {
     navigator.clipboard.writeText(formatBookingId(selected));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const handleCopyPhone = () => {
+    navigator.clipboard.writeText(selected.phone_number);
+    setPhoneCopied(true);
+    setTimeout(() => setPhoneCopied(false), 2000);
+  };
+
   return (
     <div className="flex flex-col h-full bg-[#f1f5f9] select-none text-left">
       {/* Drawer drag handle */}
@@ -135,7 +143,18 @@ function DetailPanel({ selected, onClose, updating, onUpdateStatus, repairCostIn
                 </div>
                 <div className="min-w-0">
                   <h4 className="font-bold text-[15px] text-slate-900 leading-tight truncate">{selected.full_name}</h4>
-                  <p className="text-slate-500 text-[12px] font-medium mt-0.5 truncate">{selected.phone_number}</p>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <p className="text-slate-500 text-[12px] font-medium truncate">{selected.phone_number}</p>
+                    <button 
+                      onClick={handleCopyPhone}
+                      className="text-[#004ac6] hover:bg-[#e5eeff] p-0.5 rounded transition-all flex items-center justify-center"
+                      title="Copy Phone"
+                    >
+                      <span className="material-symbols-outlined text-[13px]">
+                        {phoneCopied ? 'check' : 'content_copy'}
+                      </span>
+                    </button>
+                  </div>
                 </div>
               </div>
               <a href={`tel:${selected.phone_number}`}
