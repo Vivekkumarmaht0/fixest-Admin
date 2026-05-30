@@ -118,6 +118,9 @@ function DetailPanel({ selected, onClose, updating, onUpdateStatus, repairCostIn
                 {copied ? 'check' : 'content_copy'}
               </span>
             </button>
+            <span className="text-[11px] text-slate-500 font-medium ml-2">
+              {new Date(selected.created_at).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+            </span>
           </div>
           <h2 className="text-[21px] font-extrabold text-slate-900 mt-1.5 leading-tight tracking-tight">
             {selected.brand} {selected.model}
@@ -860,8 +863,9 @@ export default function Bookings() {
                           <div>{b.brand} {b.model}</div>
                           <div className="text-[11px] text-[#737686] capitalize">{b.device_category}</div>
                         </td>
-                        <td className="py-3 px-5 text-[11px] text-[#434655] hidden md:table-cell whitespace-nowrap">
-                          {new Date(b.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                        <td className="py-3 px-5 text-[#434655] hidden md:table-cell whitespace-nowrap">
+                          <div className="font-semibold text-[12px]">{new Date(b.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}</div>
+                          <div className="text-[10px] text-[#737686]">{new Date(b.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</div>
                         </td>
                         <td className="py-3 px-5">
                           <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border whitespace-nowrap ${sc}`}>

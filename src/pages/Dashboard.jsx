@@ -157,7 +157,12 @@ export default function Dashboard() {
                         </span>
                       </div>
                       <div className="flex items-center justify-between gap-2 mt-1">
-                        <span className="text-[11px] text-[#737686] truncate">{b.brand} {b.model}</span>
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-[11px] text-[#737686] truncate">{b.brand} {b.model}</span>
+                          <span className="text-[9px] text-[#94a3b8] mt-0.5">
+                            {new Date(b.created_at).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap flex-shrink-0 ${sc}`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${dc}`} />
                           {(b.status || 'Received').split(' ')[0]}
@@ -219,8 +224,9 @@ export default function Dashboard() {
                     <td className="py-3 px-6 text-[#434655] text-[13px]">
                       {b.brand} {b.model}
                     </td>
-                    <td className="py-3 px-6 text-[#434655] text-[12px] hidden md:table-cell whitespace-nowrap">
-                      {new Date(b.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                    <td className="py-3 px-6 text-[#434655] hidden md:table-cell whitespace-nowrap">
+                      <div className="font-semibold text-[12px]">{new Date(b.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+                      <div className="text-[10px] text-[#737686]">{new Date(b.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</div>
                     </td>
                     <td className="py-3 px-6">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border ${sc} whitespace-nowrap`}>
