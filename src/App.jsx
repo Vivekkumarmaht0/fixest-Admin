@@ -64,11 +64,54 @@ function AdminShell({ children }) {
   const navigate = useNavigate();
   const page = PAGE_LABELS[location.pathname] || { title: 'Dashboard', icon: 'dashboard' };
 
+  const VAPID_PUBLIC_KEY = 'BEt668tZ2aTzRrwzk44AUm3NKhFht10l_jTg5N54ifuDmVBszYK-rIvydKBReGJVQh2tS23pMGiaY9Gdw8r14U4';
+
+  const subscribeToWebPush = async (userId) => {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      let subscription = await registration.pushManager.getSubscription();
+      
+      if (!subscription) {
+        const urlBase64ToUint8Array = (base64String) => {
+          const padding = '='.repeat((4 - base64String.length % 4) % 4);
+          const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+          const rawData = window.atob(base64);
+          const outputArray = new Uint8Array(rawData.length);
+          for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+          }
+          return outputArray;
+        };
+
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+        });
+      }
+
+      if (subscription) {
+        const subData = JSON.parse(JSON.stringify(subscription));
+        await supabase.from('push_subscriptions').upsert({
+          user_id: userId,
+          endpoint: subData.endpoint,
+          auth_key: subData.keys.auth,
+          p256dh_key: subData.keys.p256dh
+        }, { onConflict: 'user_id, endpoint' });
+      }
+    } catch (err) {
+      console.error('Error subscribing to push:', err);
+    }
+  };
+
   const fetchProfile = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
       
+      subscribeToWebPush(user.id);
+
       const { data } = await supabase
         .from('profiles')
         .select('full_name')

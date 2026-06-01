@@ -140,3 +140,25 @@ self.addEventListener('notificationclick', (event) => {
     })
   );
 });
+
+// Handle push events (Background Notifications)
+self.addEventListener('push', (event) => {
+  if (!event.data) return;
+
+  try {
+    const data = event.data.json();
+    const title = data.title || 'New Notification';
+    const options = {
+      body: data.message || '',
+      icon: '/pwa-192.png',
+      badge: '/favicon.svg',
+      data: { url: data.url || '/bookings' },
+      vibrate: [200, 100, 200, 100, 200, 100, 200],
+      requireInteraction: false
+    };
+
+    event.waitUntil(self.registration.showNotification(title, options));
+  } catch (err) {
+    console.error('[Service Worker] Error handling push event:', err);
+  }
+});
