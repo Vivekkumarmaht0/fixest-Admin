@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, NavLink, useNavigate } from 'react-router-dom';
 import { supabase } from './utils/supabase';
-import Login    from './pages/Login';
-import Signup   from './pages/Signup';
-import ForgotPassword from './pages/ForgotPassword';
-import Dashboard from './pages/Dashboard';
-import Bookings  from './pages/Bookings';
-import Team      from './pages/Team';
-import Settings  from './pages/Settings';
+
+const Login = lazy(() => import('./pages/Login'));
+const Signup = lazy(() => import('./pages/Signup'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Bookings = lazy(() => import('./pages/Bookings'));
+const Team = lazy(() => import('./pages/Team'));
+const Settings = lazy(() => import('./pages/Settings'));
 import Sidebar   from './components/Sidebar';
 import CookieConsent from './components/CookieConsent';
 
@@ -609,16 +610,24 @@ function App() {
 
   return (
     <Router>
-      <Routes>
-        <Route path="/login"    element={!isAdmin ? <Login /> : <Navigate to="/" replace />} />
-        <Route path="/signup"   element={!isAdmin ? <Signup /> : <Navigate to="/" replace />} />
-        <Route path="/forgot-password" element={!isAdmin ? <ForgotPassword /> : <Navigate to="/" replace />} />
-        <Route path="/"         element={<ProtectedRoute isAdmin={isAdmin}><Dashboard /></ProtectedRoute>} />
-        <Route path="/bookings" element={<ProtectedRoute isAdmin={isAdmin}><Bookings  /></ProtectedRoute>} />
-        <Route path="/team"     element={<ProtectedRoute isAdmin={isAdmin}><Team      /></ProtectedRoute>} />
-        <Route path="/settings" element={<ProtectedRoute isAdmin={isAdmin}><Settings  /></ProtectedRoute>} />
-        <Route path="*"         element={<Navigate to="/" replace />} />
-      </Routes>
+      <Suspense fallback={
+        <div className="loading-screen">
+          <div className="flex flex-col items-center gap-3">
+            Loading...
+          </div>
+        </div>
+      }>
+        <Routes>
+          <Route path="/login"    element={!isAdmin ? <Login /> : <Navigate to="/" replace />} />
+          <Route path="/signup"   element={!isAdmin ? <Signup /> : <Navigate to="/" replace />} />
+          <Route path="/forgot-password" element={!isAdmin ? <ForgotPassword /> : <Navigate to="/" replace />} />
+          <Route path="/"         element={<ProtectedRoute isAdmin={isAdmin}><Dashboard /></ProtectedRoute>} />
+          <Route path="/bookings" element={<ProtectedRoute isAdmin={isAdmin}><Bookings  /></ProtectedRoute>} />
+          <Route path="/team"     element={<ProtectedRoute isAdmin={isAdmin}><Team      /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute isAdmin={isAdmin}><Settings  /></ProtectedRoute>} />
+          <Route path="*"         element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
       <CookieConsent />
     </Router>
   );
