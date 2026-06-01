@@ -58,8 +58,11 @@ function AdminShell({ children }) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [activeToast, setActiveToast] = useState(null);
-  const [profile, setProfile] = useState({ name: 'Admin', initial: 'A' });
+  const [profile, setProfile] = useState({ name: 'Admin', initial: 'A', id: null });
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [pushPermission, setPushPermission] = useState(
+    typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'denied'
+  );
   const location = useLocation();
   const navigate = useNavigate();
   const page = PAGE_LABELS[location.pathname] || { title: 'Dashboard', icon: 'dashboard' };
@@ -121,10 +124,10 @@ function AdminShell({ children }) {
       if (data && data.full_name) {
         const name = data.full_name;
         const initial = name.charAt(0).toUpperCase();
-        setProfile({ name, initial });
+        setProfile({ name, initial, id: user.id });
       } else if (user.email) {
         const emailName = user.email.split('@')[0];
-        setProfile({ name: emailName, initial: emailName.charAt(0).toUpperCase() });
+        setProfile({ name: emailName, initial: emailName.charAt(0).toUpperCase(), id: user.id });
       }
     } catch (err) {
       console.error('Error fetching profile in AdminShell:', err);
@@ -148,13 +151,6 @@ function AdminShell({ children }) {
   };
 
   useEffect(() => {
-    // Request permission for system browser notification popup
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      if (Notification.permission === 'default') {
-        Notification.requestPermission();
-      }
-    }
-
     fetchNotifications();
     fetchProfile();
 
@@ -466,6 +462,30 @@ function AdminShell({ children }) {
             </div>
           </div>
         </header>
+
+        {/* Push Notification Opt-in Banner */}
+        {pushPermission === 'default' && (
+          <div className="bg-[#004ac6]/10 border-b border-[#004ac6]/20 px-5 py-3 flex items-center justify-between z-30 relative">
+            <div className="flex items-center gap-3">
+              <span className="material-symbols-outlined text-[#004ac6]">notifications_active</span>
+              <p className="text-[13px] font-medium text-[#0b1c30]">
+                Enable push notifications to receive alerts on this device even when the app is closed.
+              </p>
+            </div>
+            <button 
+              onClick={async () => {
+                const perm = await Notification.requestPermission();
+                setPushPermission(perm);
+                if (perm === 'granted' && profile.id) {
+                  subscribeToWebPush(profile.id);
+                }
+              }}
+              className="bg-[#004ac6] hover:bg-[#003da6] text-white px-4 py-1.5 rounded-full text-[12px] font-bold shadow-sm transition-all whitespace-nowrap"
+            >
+              Enable Now
+            </button>
+          </div>
+        )}
 
         {/* Page content */}
         <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
