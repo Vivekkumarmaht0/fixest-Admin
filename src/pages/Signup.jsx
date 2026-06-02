@@ -55,8 +55,8 @@ export default function Signup() {
       <div className="relative z-10 w-full max-w-md my-8">
         {/* Branding */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/60 backdrop-blur-md border border-white/60 shadow-sm mb-4">
-            <span className="material-symbols-outlined icon-fill text-[#004ac6] text-3xl">admin_panel_settings</span>
+          <div className="inline-flex items-center justify-center w-20 h-20 mb-4">
+            <img src="/fixest-logo.png" alt="Fixest Logo" className="w-full h-full object-contain drop-shadow-sm" />
           </div>
           <h1 className="text-[28px] font-bold tracking-tight text-[#0b1c30] leading-tight">Join Fixest Team</h1>
           <p className="text-[13px] text-[#434655] mt-1.5">Register a new administrator/operator account</p>

@@ -79,8 +79,8 @@ export default function Sidebar({ isOpen, setIsOpen }) {
         {/* Brand + mobile close */}
         <div className="px-5 pb-5 mb-1 border-b border-white/20 flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#004ac6] to-[#006591] flex items-center justify-center text-white shadow-md flex-shrink-0">
-              <span className="material-symbols-outlined icon-fill text-[20px]">build_circle</span>
+            <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+              <img src="/fixest-logo.png" alt="Fixest Logo" className="w-full h-full object-contain" />
             </div>
             <div className="min-w-0">
               <h1 className="font-extrabold text-[16px] bg-gradient-to-br from-[#004ac6] to-[#006591] bg-clip-text text-transparent tracking-tight leading-tight truncate">
