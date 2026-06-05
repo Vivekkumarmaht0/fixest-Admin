@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fixest-admin-cache-v2';
+const CACHE_NAME = 'fixest-admin-cache-v4';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
