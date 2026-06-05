@@ -96,6 +96,19 @@ function DetailPanel({ selected, onClose, updating, onUpdateStatus, repairCostIn
     setTimeout(() => setPhoneCopied(false), 2000);
   };
 
+  const issueText = selected.issue_details || '';
+  const hasPromo = issueText.includes('[PROMO_APPLIED:');
+  let cleanIssue = issueText;
+  let promoCode = '';
+
+  if (hasPromo) {
+    const match = issueText.match(/\[PROMO_APPLIED:\s*(.+?)\]/);
+    if (match) {
+      promoCode = match[1];
+      cleanIssue = issueText.replace(/\[PROMO_APPLIED:\s*.+?\]/g, '').trim();
+    }
+  }
+
   return (
     <div className="flex flex-col h-full bg-[#f1f5f9] select-none text-left">
       {/* Drawer drag handle */}
@@ -206,11 +219,17 @@ function DetailPanel({ selected, onClose, updating, onUpdateStatus, repairCostIn
               <span className="material-symbols-outlined text-[19px] font-bold icon-fill">handyman</span>
               <h4 className="font-bold text-[14.5px] text-slate-900">{selected.primary_issue || 'Repair Issue'}</h4>
             </div>
-            <p className="text-slate-600 text-[12.5px] leading-relaxed mt-1">
-              {selected.issue_details && selected.issue_details !== 'N/A'
-                ? selected.issue_details
+            <p className="text-slate-600 text-[12.5px] leading-relaxed mt-1 whitespace-pre-wrap">
+              {cleanIssue && cleanIssue !== 'N/A'
+                ? cleanIssue
                 : `Customer requested diagnosis and repair for ${selected.brand} ${selected.model}. Reported issue: ${selected.primary_issue}.`}
             </p>
+            {promoCode && (
+              <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-50 text-emerald-700 text-[11px] font-bold rounded-lg w-max border border-emerald-200">
+                <span className="material-symbols-outlined text-[15px]">local_offer</span>
+                Promo Applied: {promoCode}
+              </div>
+            )}
           </div>
         </div>
 
