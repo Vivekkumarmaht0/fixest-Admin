@@ -31,22 +31,49 @@ export default function Sidebar({ isOpen, setIsOpen }) {
 
   /* PWA Installation Interception Listener */
   useEffect(() => {
+    // Failsafe: check if already running as installed app
+    const isInstalled = () => {
+      return window.matchMedia('(display-mode: standalone)').matches || 
+             window.navigator.standalone || 
+             document.referrer.includes('android-app://');
+    };
+
+    const checkPrompt = () => {
+      if (isInstalled()) {
+        setShowInstallPrompt(false);
+        return;
+      }
+      if (window.deferredPWAInstallPrompt) {
+        setDeferredPrompt(window.deferredPWAInstallPrompt);
+        setShowInstallPrompt(true);
+      }
+    };
+
+    checkPrompt();
+
     const handleBeforeInstall = (e) => {
       e.preventDefault();
+      if (isInstalled()) return;
+      window.deferredPWAInstallPrompt = e;
       setDeferredPrompt(e);
       setShowInstallPrompt(true);
     };
 
+    window.addEventListener('pwa-prompt-ready', checkPrompt);
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
 
-    window.addEventListener('appinstalled', () => {
+    const handleAppInstalled = () => {
+      window.deferredPWAInstallPrompt = null;
       setDeferredPrompt(null);
       setShowInstallPrompt(false);
       console.log('Fixest Admin App was successfully installed!');
-    });
+    };
+    window.addEventListener('appinstalled', handleAppInstalled);
 
     return () => {
+      window.removeEventListener('pwa-prompt-ready', checkPrompt);
       window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+      window.removeEventListener('appinstalled', handleAppInstalled);
     };
   }, []);
 
@@ -56,6 +83,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     const { outcome } = await deferredPrompt.userChoice;
     console.log(`PWA Installation outcome: ${outcome}`);
     if (outcome === 'accepted') {
+      window.deferredPWAInstallPrompt = null;
       setDeferredPrompt(null);
       setShowInstallPrompt(false);
     }

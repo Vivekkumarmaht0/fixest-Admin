@@ -3,6 +3,14 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 
+// Global PWA Install Prompt Intercept
+window.deferredPWAInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  window.deferredPWAInstallPrompt = e;
+  window.dispatchEvent(new Event('pwa-prompt-ready'));
+});
+
 // Register Progressive Web App Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
