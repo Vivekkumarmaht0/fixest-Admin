@@ -731,7 +731,7 @@ export default function Bookings() {
               </div>
               <button onClick={() => fetchBookings(true)} disabled={refreshing}
                 className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-[#e2e8f0] text-[#004ac6] font-bold text-[13px] hover:bg-slate-50 shadow-sm transition-all disabled:opacity-60 flex-shrink-0">
-                <span className="material-symbols-outlined text-[18px]">sync</span>
+                <span className={`material-symbols-outlined text-[18px] ${refreshing ? 'animate-spin [animation-direction:reverse]' : ''}`}>sync</span>
                 <span className="hidden sm:inline">Refresh</span>
               </button>
               <button onClick={() => setShowFilters(true)}

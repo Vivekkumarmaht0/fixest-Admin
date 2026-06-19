@@ -53,6 +53,17 @@ export default function Team() {
   const [search, setSearch]   = useState('');
   const [team, setTeam]       = useState([]);
   const [loading, setLoading] = useState(true);
+  const [openMenuId, setOpenMenuId] = useState(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.action-menu-container')) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const fetchTeam = async () => {
@@ -181,9 +192,28 @@ export default function Team() {
                     </div>
                   </div>
                   {/* Actions */}
-                  <button className="w-8 h-8 flex items-center justify-center rounded-lg text-[#737686] hover:bg-white/60 active:bg-white/80 transition-colors flex-shrink-0">
-                    <span className="material-symbols-outlined text-[18px]">more_horiz</span>
-                  </button>
+                  <div className="relative action-menu-container">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === m.id ? null : m.id); }}
+                      className="w-8 h-8 flex items-center justify-center rounded-lg text-[#737686] hover:bg-white/60 active:bg-white/80 transition-colors flex-shrink-0"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">more_horiz</span>
+                    </button>
+                    {openMenuId === m.id && (
+                      <div className="absolute right-8 top-0 w-[220px] bg-white rounded-xl shadow-xl border border-slate-100 z-50 text-left p-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[16px] text-[#004ac6]">mail</span>
+                            <span className="text-[12px] font-medium text-slate-700 truncate select-all">{m.email}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[16px] text-[#004ac6]">call</span>
+                            <span className="text-[12px] font-medium text-slate-700 truncate select-all">{m.phone}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -228,10 +258,27 @@ export default function Team() {
                         </div>
                       </td>
                       <td className="py-4 px-6 text-[12px] text-[#737686] hidden md:table-cell">{m.last}</td>
-                      <td className="py-4 px-6 text-right">
-                        <button className="p-1.5 rounded-lg text-[#737686] hover:bg-white/60 hover:text-[#0b1c30] transition-colors">
+                      <td className="py-4 px-6 text-right relative action-menu-container">
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === m.id ? null : m.id); }}
+                          className="p-1.5 rounded-lg text-[#737686] hover:bg-white/60 hover:text-[#0b1c30] transition-colors"
+                        >
                           <span className="material-symbols-outlined text-[18px]">more_horiz</span>
                         </button>
+                        {openMenuId === m.id && (
+                          <div className="absolute right-12 top-10 w-[220px] bg-white rounded-xl shadow-xl border border-slate-100 z-50 text-left p-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                            <div className="flex flex-col gap-2">
+                              <div className="flex items-center gap-2">
+                                <span className="material-symbols-outlined text-[16px] text-[#004ac6]">mail</span>
+                                <span className="text-[12px] font-medium text-slate-700 truncate select-all">{m.email}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="material-symbols-outlined text-[16px] text-[#004ac6]">call</span>
+                                <span className="text-[12px] font-medium text-slate-700 truncate select-all">{m.phone}</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </td>
                     </tr>
                   ))}
