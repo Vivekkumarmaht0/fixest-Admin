@@ -17,7 +17,7 @@ const PAGE_LABELS = {
   '/':         { title: 'Dashboard',   icon: 'dashboard'  },
   '/bookings': { title: 'Bookings',    icon: 'event_note' },
   '/team':     { title: 'Team',        icon: 'group'      },
-  '/settings': { title: 'Settings',    icon: 'settings'   },
+  '/settings': { title: 'Inventory',   icon: 'inventory'  },
 };
 
 const ProtectedRoute = ({ children, isAdmin }) =>
@@ -61,6 +61,8 @@ function AdminShell({ children }) {
   const [activeToast, setActiveToast] = useState(null);
   const [profile, setProfile] = useState({ name: 'Admin', initial: 'A', id: null });
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [isOnline, setIsOnline] = useState(false);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [pushPermission, setPushPermission] = useState(
     typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'denied'
   );
@@ -109,6 +111,27 @@ function AdminShell({ children }) {
     }
   };
 
+  const toggleOnlineStatus = async () => {
+    if (!profile.id || isUpdatingStatus) return;
+    setIsUpdatingStatus(true);
+    const newStatus = !isOnline;
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_online: newStatus })
+        .eq('id', profile.id);
+        
+      if (!error) {
+        setIsOnline(newStatus);
+      }
+    } catch (err) {
+      console.error('Error toggling status:', err);
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
+
   const fetchProfile = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -118,9 +141,13 @@ function AdminShell({ children }) {
 
       const { data } = await supabase
         .from('profiles')
-        .select('full_name')
+        .select('full_name, is_online')
         .eq('id', user.id)
         .maybeSingle();
+        
+      if (data) {
+        setIsOnline(data.is_online || false);
+      }
         
       if (data && data.full_name) {
         const name = data.full_name;
@@ -326,31 +353,47 @@ function AdminShell({ children }) {
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
       {/* Main area */}
-      <div className="flex-1 flex flex-col lg:ml-[260px] relative z-10 pb-16 lg:pb-0">
+      <div className="flex-1 flex flex-col lg:ml-[260px] relative z-10 pb-[90px] lg:pb-0">
 
-        {/* Top Header */}
-        <header className="bg-white border-b border-[#c3c6d7]/30 lg:bg-white/70 lg:backdrop-blur-md sticky top-0 z-40 flex items-center justify-between px-5 md:px-8 h-16">
-          {/* Left Side: "Fixest" on mobile, Breadcrumb on desktop */}
-          <div className="flex items-center gap-3">
-            <h1 className="lg:hidden text-[26px] font-extrabold text-[#004ac6] tracking-tight">Fixest</h1>
-            
-            <div className="hidden lg:flex items-center gap-2">
-              <span className="material-symbols-outlined text-[#004ac6] text-[20px] icon-fill">{page.icon}</span>
-              <h2 className="text-[16px] font-bold text-[#0b1c30] tracking-tight">{page.title}</h2>
-            </div>
+        {/* Top Header - Match User Image Design */}
+        <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-white/50 shadow-[0_2px_10px_rgba(0,0,0,0.02)] px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between transition-all">
+          
+          {/* Left: Brand Title */}
+          <div className="flex items-center min-w-0 flex-shrink-0">
+            <h2 className="text-[22px] sm:text-[24px] font-extrabold text-[#004ac6] tracking-tight">
+              Fixest
+            </h2>
           </div>
 
-          {/* Right actions */}
-          <div className="flex items-center gap-2.5">
+          {/* Right actions: Toggle, Bell, Avatar */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            
+            {/* Online Status Toggle (Styled like the Light/Dark toggle from the image) */}
+            <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-full bg-slate-50 border border-slate-100 shadow-sm">
+              <span className={`text-[10.5px] sm:text-[12px] font-bold ${!isOnline ? 'text-[#0b1c30]' : 'text-slate-400'}`}>
+                Offline
+              </span>
+              <button 
+                onClick={toggleOnlineStatus}
+                disabled={isUpdatingStatus}
+                className={`relative flex items-center w-[52px] h-[24px] shrink-0 rounded-full transition-colors duration-300 ease-in-out p-[3px] focus:outline-none ${isOnline ? 'bg-[#004ac6]' : 'bg-slate-300'} ${isUpdatingStatus ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}`}
+              >
+                <div className={`bg-white w-[18px] h-[18px] rounded-full shadow-sm transform transition-transform duration-300 ease-in-out ${isOnline ? 'translate-x-[28px]' : 'translate-x-0'}`} />
+              </button>
+              <span className={`text-[10.5px] sm:text-[12px] font-bold ${isOnline ? 'text-[#0b1c30]' : 'text-slate-400'}`}>
+                Online
+              </span>
+            </div>
+
             {/* Notification bell and dropdown */}
-            <div className="relative notification-container">
+            <div className="relative notification-container flex-shrink-0 ml-1">
               <button 
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="relative p-2 rounded-full text-[#434655] hover:bg-slate-100 transition-all focus:outline-none"
+                className="relative flex items-center justify-center text-[#0b1c30] hover:text-[#004ac6] transition-colors focus:outline-none p-1"
               >
-                <span className="material-symbols-outlined text-[22px]">notifications</span>
+                <span className="material-symbols-outlined text-[26px]">notifications</span>
                 {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 px-1.5 py-0.5 min-w-[16px] min-h-[16px] flex items-center justify-center bg-[#ba1a1a] text-white text-[9px] font-extrabold rounded-full animate-pulse shadow-sm">
+                  <span className="absolute top-[2px] right-[4px] px-1 py-0.5 min-w-[14px] min-h-[14px] flex items-center justify-center bg-[#ba1a1a] text-white text-[9px] font-extrabold rounded-full animate-pulse shadow-sm">
                     {unreadCount}
                   </span>
                 )}
@@ -514,15 +557,6 @@ function AdminShell({ children }) {
           <span className="material-symbols-outlined text-[22px]">event_note</span>
           <span className="text-[10px] mt-0.5">Bookings</span>
         </NavLink>
-        <NavLink to="/settings" className={({ isActive }) => 
-          `flex flex-col items-center justify-center w-full h-full relative transition-all duration-150
-          ${isActive 
-            ? 'text-[#004ac6] border-t-2 border-[#004ac6] bg-gradient-to-b from-[#004ac6]/8 to-transparent font-bold' 
-            : 'text-[#737686]'}`
-        }>
-          <span className="material-symbols-outlined text-[22px]">inventory</span>
-          <span className="text-[10px] mt-0.5">Inventory</span>
-        </NavLink>
         <NavLink to="/team" className={({ isActive }) => 
           `flex flex-col items-center justify-center w-full h-full relative transition-all duration-150
           ${isActive 
@@ -531,6 +565,15 @@ function AdminShell({ children }) {
         }>
           <span className="material-symbols-outlined text-[22px]">group</span>
           <span className="text-[10px] mt-0.5">Team</span>
+        </NavLink>
+        <NavLink to="/settings" className={({ isActive }) => 
+          `flex flex-col items-center justify-center w-full h-full relative transition-all duration-150
+          ${isActive 
+            ? 'text-[#004ac6] border-t-2 border-[#004ac6] bg-gradient-to-b from-[#004ac6]/8 to-transparent font-bold' 
+            : 'text-[#737686]'}`
+        }>
+          <span className="material-symbols-outlined text-[22px]">inventory</span>
+          <span className="text-[10px] mt-0.5">Inventory</span>
         </NavLink>
       </div>
 

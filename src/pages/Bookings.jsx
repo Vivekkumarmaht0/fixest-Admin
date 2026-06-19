@@ -721,59 +721,52 @@ export default function Bookings() {
 
           {/* Toolbar */}
           <div className="bg-transparent sm:bg-white/30 border-b border-transparent sm:border-white/40 px-4 py-4 sm:px-4 sm:py-4 space-y-3">
-            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-              <div className="flex flex-col xl:flex-row gap-3 min-w-0 flex-1">
-                <div className="flex flex-col sm:flex-row gap-3 min-w-0 flex-1">
-                  <div className="relative min-w-0 flex-1">
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#737686] text-[20px] pointer-events-none">search</span>
-                    <input type="text" placeholder="Search by name, ID, or phone…" value={searchTerm}
-                      onChange={e => setSearch(e.target.value)}
-                      className="glass-input w-full pl-10 pr-4 py-2.5 rounded-xl text-[14px] text-[#0b1c30] placeholder:text-[#737686]" />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="relative min-w-[145px] flex-shrink-0">
-                      <input type="date" value={dateFilter}
-                        onChange={e => setDateFilter(e.target.value)}
-                        className="glass-input w-full pl-9 pr-3 py-2.5 rounded-xl text-[14px] text-[#0b1c30] placeholder:text-[#737686] cursor-pointer bg-white border border-[#e2e8f0]" />
-                      <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#004ac6] text-[18px] pointer-events-none">calendar_month</span>
-                      {dateFilter && (
-                        <button onClick={() => setDateFilter('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-[#ba1a1a] hover:bg-red-50 rounded-full w-6 h-6 flex items-center justify-center transition-all bg-white shadow-sm" title="Clear date">
-                          <span className="material-symbols-outlined text-[14px]">close</span>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Quick Date Filters */}
-                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 xl:pb-0">
-                  <button onClick={() => setQuickDate(0)} 
-                    className="px-3 py-1.5 rounded-full text-[12px] font-bold tracking-wide transition-all whitespace-nowrap border bg-white border-[#e2e8f0] text-[#004ac6] hover:bg-[#004ac6]/5 flex-shrink-0 shadow-sm">
-                    Today
-                  </button>
-                  <button onClick={() => setQuickDate(1)} 
-                    className="px-3 py-1.5 rounded-full text-[12px] font-bold tracking-wide transition-all whitespace-nowrap border bg-white border-[#e2e8f0] text-[#004ac6] hover:bg-[#004ac6]/5 flex-shrink-0 shadow-sm">
-                    Tomorrow
-                  </button>
-                  {dateFilter && (
-                    <button onClick={() => setDateFilter('')} 
-                      className="px-3 py-1.5 rounded-full text-[12px] font-bold tracking-wide transition-all whitespace-nowrap border bg-white border-[#e2e8f0] text-[#ba1a1a] hover:bg-red-50 flex-shrink-0 shadow-sm">
-                      Clear Date
-                    </button>
-                  )}
-                </div>
+            {/* ROW 1: Search, Refresh, Filter */}
+            <div className="flex items-center gap-2 w-full">
+              <div className="relative flex-1 min-w-0">
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#737686] text-[18px] pointer-events-none">search</span>
+                <input type="text" placeholder="Search…" value={searchTerm}
+                  onChange={e => setSearch(e.target.value)}
+                  className="glass-input w-full pl-9 pr-3 py-2 rounded-xl text-[13px] text-[#0b1c30] placeholder:text-[#737686]" />
               </div>
-              <div className="flex items-center gap-2">
-                <button onClick={() => fetchBookings(true)} disabled={refreshing}
-                  className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white border border-[#e2e8f0] text-[#004ac6] font-medium text-[13px] hover:bg-slate-50 shadow-sm transition-all disabled:opacity-60">
-                  <span className="material-symbols-outlined text-[18px]">sync</span>
-                  Refresh
-                </button>
-                <button onClick={() => setShowFilters(true)}
-                  className="sm:hidden w-11 h-11 rounded-xl border flex items-center justify-center transition-all flex-shrink-0 shadow-sm bg-white border-[#e2e8f0] text-[#64748b] hover:bg-slate-50">
-                  <span className="material-symbols-outlined text-[20px]">tune</span>
-                </button>
+              <button onClick={() => fetchBookings(true)} disabled={refreshing}
+                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-[#e2e8f0] text-[#004ac6] font-bold text-[13px] hover:bg-slate-50 shadow-sm transition-all disabled:opacity-60 flex-shrink-0">
+                <span className="material-symbols-outlined text-[18px]">sync</span>
+                <span className="hidden sm:inline">Refresh</span>
+              </button>
+              <button onClick={() => setShowFilters(true)}
+                className="sm:hidden w-9 h-9 rounded-xl border flex items-center justify-center transition-all flex-shrink-0 shadow-sm bg-white border-[#e2e8f0] text-[#64748b] hover:bg-slate-50">
+                <span className="material-symbols-outlined text-[18px]">tune</span>
+              </button>
+            </div>
+
+            {/* ROW 2: Date, Today, Tomorrow */}
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5 w-full">
+              <div className="relative min-w-[125px] flex-shrink-0">
+                <input type="date" value={dateFilter}
+                  onChange={e => setDateFilter(e.target.value)}
+                  className="glass-input w-full pl-8 pr-2 py-1.5 rounded-xl text-[12px] text-[#0b1c30] placeholder:text-[#737686] cursor-pointer bg-white border border-[#e2e8f0]" />
+                <span className="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[#004ac6] text-[16px] pointer-events-none">calendar_month</span>
+                {dateFilter && (
+                  <button onClick={() => setDateFilter('')} className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[#ba1a1a] hover:bg-red-50 rounded-full w-5 h-5 flex items-center justify-center transition-all bg-white shadow-sm" title="Clear date">
+                    <span className="material-symbols-outlined text-[12px]">close</span>
+                  </button>
+                )}
               </div>
+              <button onClick={() => setQuickDate(0)} 
+                className="px-3 py-1.5 rounded-full text-[12px] font-bold tracking-wide transition-all whitespace-nowrap border bg-white border-[#e2e8f0] text-[#004ac6] hover:bg-[#004ac6]/5 flex-shrink-0 shadow-sm">
+                Today
+              </button>
+              <button onClick={() => setQuickDate(1)} 
+                className="px-3 py-1.5 rounded-full text-[12px] font-bold tracking-wide transition-all whitespace-nowrap border bg-white border-[#e2e8f0] text-[#004ac6] hover:bg-[#004ac6]/5 flex-shrink-0 shadow-sm">
+                Tomorrow
+              </button>
+              {dateFilter && (
+                <button onClick={() => setDateFilter('')} 
+                  className="px-3 py-1.5 rounded-full text-[12px] font-bold tracking-wide transition-all whitespace-nowrap border bg-white border-[#e2e8f0] text-[#ba1a1a] hover:bg-red-50 flex-shrink-0 shadow-sm">
+                  Clear
+                </button>
+              )}
             </div>
 
             <div className="hidden sm:flex flex-wrap items-center gap-2 overflow-x-auto pb-0.5 no-scrollbar">

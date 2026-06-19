@@ -81,7 +81,7 @@ export default function Team() {
             phone: profile.phone || 'No phone',
             role: profile.role,
             status: status,
-            last: timeAgo(profile.updated_at),
+            last: profile.is_online ? 'Now' : timeAgo(profile.updated_at),
             avatar: avatar,
             avatarBg: getAvatarBg(name)
           };
@@ -105,7 +105,7 @@ export default function Team() {
   });
 
   return (
-    <div className="space-y-4 sm:space-y-5">
+    <div className="space-y-4 sm:space-y-5 w-full overflow-hidden">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
         <div>
@@ -118,11 +118,11 @@ export default function Team() {
       <div className="glass-card rounded-2xl overflow-hidden min-h-[400px] flex flex-col">
         {/* Toolbar */}
         <div className="p-3 sm:p-4 border-b border-white/40 bg-white/30 space-y-2.5 sm:space-y-3">
-          {/* Filter tabs — horizontal scroll on mobile */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
+          {/* Filter tabs */}
+          <div className="flex flex-wrap items-center gap-1.5 pb-0.5">
             {TABS.map(t => (
               <button key={t} onClick={() => setTab(t)}
-                className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-[13px] font-semibold transition-all whitespace-nowrap flex-shrink-0 border
+                className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-[13px] font-semibold transition-all flex-shrink-0 border
                   ${tab === t ? 'bg-[#004ac6] text-white border-[#004ac6] shadow-sm' : 'text-[#434655] bg-white/50 border-white/50 hover:bg-white/80 active:bg-white/90'}`}>
                 {t}
               </button>
@@ -166,15 +166,14 @@ export default function Team() {
                     <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white ${STATUS_DOT[m.status]}`} />
                   </div>
                   {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-semibold text-[13px] text-[#0b1c30] truncate">{m.name}</span>
+                  <div className="flex-1 min-w-0 overflow-hidden">
+                    <div className="flex items-center justify-between gap-2 w-full">
+                      <span className="font-semibold text-[13px] text-[#0b1c30] truncate flex-1 min-w-0">{m.name}</span>
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border flex-shrink-0 uppercase ${ROLE_BADGE[m.role] || 'bg-slate-100 text-slate-600'}`}>
                         {m.role}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between gap-2 mt-0.5">
-                      <span className="text-[11px] text-[#737686] truncate">{m.email}</span>
+                    <div className="flex items-center gap-2 mt-0.5">
                       <div className="flex items-center gap-1 text-[11px] font-medium text-[#434655] flex-shrink-0">
                         <span className={`w-1.5 h-1.5 rounded-full ${STATUS_DOT[m.status]}`} />
                         {m.status}
@@ -214,7 +213,6 @@ export default function Team() {
                           </div>
                           <div className="min-w-0">
                             <div className="font-semibold text-[14px] truncate">{m.name}</div>
-                            <div className="text-[12px] text-[#737686] truncate">{m.email}</div>
                           </div>
                         </div>
                       </td>
@@ -251,9 +249,9 @@ export default function Team() {
 
             {/* Footer */}
             {filtered.length > 0 && (
-              <div className="px-3.5 sm:px-6 py-3 border-t border-white/30 bg-white/20 flex items-center justify-between mt-auto">
-                <p className="text-[11px] sm:text-[12px] text-[#737686]">Showing {filtered.length} of {team.length} members</p>
-                <div className="flex items-center gap-1">
+              <div className="px-3.5 sm:px-6 py-3 border-t border-white/30 bg-white/20 flex flex-col sm:flex-row sm:items-center justify-between mt-auto gap-3">
+                <p className="text-[11px] sm:text-[12px] text-[#737686] text-center sm:text-left">Showing {filtered.length} of {team.length} members</p>
+                <div className="flex items-center justify-center gap-1 w-full sm:w-auto">
                   <button className="p-1.5 rounded-lg text-[#737686] hover:bg-white/60 transition-colors disabled:opacity-30" disabled>
                     <span className="material-symbols-outlined text-[18px]">chevron_left</span>
                   </button>

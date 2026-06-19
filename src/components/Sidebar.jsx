@@ -6,7 +6,7 @@ const navItems = [
   { to: '/',          icon: 'dashboard',   label: 'Dashboard' },
   { to: '/bookings',  icon: 'event_note',  label: 'Bookings'  },
   { to: '/team',      icon: 'group',       label: 'Team'      },
-  { to: '/settings',  icon: 'settings',    label: 'Settings'  },
+  { to: '/settings',  icon: 'inventory',   label: 'Inventory' },
 ];
 
 export default function Sidebar({ isOpen, setIsOpen }) {
