@@ -2,14 +2,19 @@ import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, NavLink, useNavigate } from 'react-router-dom';
 import { supabase } from './utils/supabase';
 
-const Login = lazy(() => import('./pages/Login'));
-const Signup = lazy(() => import('./pages/Signup'));
-const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Bookings = lazy(() => import('./pages/Bookings'));
-const Team = lazy(() => import('./pages/Team'));
-const Settings = lazy(() => import('./pages/Settings'));
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import ForgotPassword from './pages/ForgotPassword';
+import UpdatePassword from './pages/UpdatePassword';
+import Dashboard from './pages/Dashboard';
+import Bookings from './pages/Bookings';
+import Team from './pages/Team';
+import Settings from './pages/Settings';
+import RiderDashboard from './pages/RiderDashboard';
+import RiderTasks from './pages/RiderTasks';
+import RiderEarnings from './pages/RiderEarnings';
 import Sidebar   from './components/Sidebar';
+import RiderShell from './components/RiderShell';
 import CookieConsent from './components/CookieConsent';
 
 /* ── Page title lookup ─────────────────────────────── */
@@ -20,8 +25,15 @@ const PAGE_LABELS = {
   '/settings': { title: 'Inventory',   icon: 'inventory'  },
 };
 
-const ProtectedRoute = ({ children, isAdmin }) =>
-  isAdmin ? <AdminShell>{children}</AdminShell> : <Navigate to="/login" replace />;
+const ProtectedRoute = ({ children, allowedRoles, currentRole }) => {
+  if (!currentRole) return <Navigate to="/login" replace />;
+  if (!allowedRoles.includes(currentRole)) return <Navigate to="/" replace />;
+  
+  if (currentRole === 'rider') {
+    return <RiderShell>{children}</RiderShell>;
+  }
+  return <AdminShell>{children}</AdminShell>;
+};
 
 /* ── Authenticated shell with sidebar + header ─────── */
 function playNotificationChime() {
@@ -162,11 +174,13 @@ function AdminShell({ children }) {
     }
   };
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = async (uid) => {
+    if (!uid) return;
     try {
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
+        .eq('user_id', uid)
         .order('created_at', { ascending: false })
         .limit(10);
       if (data) {
@@ -179,16 +193,23 @@ function AdminShell({ children }) {
   };
 
   useEffect(() => {
-    fetchNotifications();
     fetchProfile();
+    let channel;
+    
+    const initNotifs = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      fetchNotifications(user.id);
 
-    const channel = supabase
-      .channel('realtime-notifications')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'notifications'
-      }, (payload) => {
+      channel = supabase
+        .channel(`admin-notifications-${user.id}`)
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`
+        }, (payload) => {
         if (payload.eventType === 'INSERT') {
           setNotifications(prev => {
             if (prev.some(n => n.id === payload.new.id)) return prev;
@@ -235,13 +256,16 @@ function AdminShell({ children }) {
             type: payload.new.type
           });
         } else {
-          fetchNotifications();
+          fetchNotifications(user.id);
         }
       })
       .subscribe();
+    };
+
+    initNotifs();
 
     return () => {
-      channel.unsubscribe();
+      if (channel) supabase.removeChannel(channel);
     };
   }, []);
 
@@ -615,14 +639,25 @@ function App() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      if (session) fetchRole(session.user.id);
-      else setLoading(false);
+      if (session) {
+        setLoading(true);
+        fetchRole(session.user.id);
+      } else {
+        setLoading(false);
+      }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
-      if (session) fetchRole(session.user.id);
-      else { setRole(null); setLoading(false); }
+      if (session) {
+        if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+          setLoading(true);
+          fetchRole(session.user.id);
+        }
+      } else {
+        setRole(null);
+        setLoading(false);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -649,28 +684,29 @@ function App() {
     );
   }
 
-  const isAdmin = session && (role === 'admin' || role === 'staff');
+  const isAuthenticated = !!session;
 
   return (
     <Router>
-      <Suspense fallback={
-        <div className="loading-screen">
-          <div className="flex flex-col items-center gap-3">
-            Loading...
-          </div>
-        </div>
-      }>
         <Routes>
-          <Route path="/login"    element={!isAdmin ? <Login /> : <Navigate to="/" replace />} />
-          <Route path="/signup"   element={!isAdmin ? <Signup /> : <Navigate to="/" replace />} />
-          <Route path="/forgot-password" element={!isAdmin ? <ForgotPassword /> : <Navigate to="/" replace />} />
-          <Route path="/"         element={<ProtectedRoute isAdmin={isAdmin}><Dashboard /></ProtectedRoute>} />
-          <Route path="/bookings" element={<ProtectedRoute isAdmin={isAdmin}><Bookings  /></ProtectedRoute>} />
-          <Route path="/team"     element={<ProtectedRoute isAdmin={isAdmin}><Team      /></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute isAdmin={isAdmin}><Settings  /></ProtectedRoute>} />
+          <Route path="/login"    element={!isAuthenticated ? <Login /> : <Navigate to="/" replace />} />
+          <Route path="/signup"   element={!isAuthenticated ? <Signup /> : <Navigate to="/" replace />} />
+          <Route path="/forgot-password" element={!isAuthenticated ? <ForgotPassword /> : <Navigate to="/" replace />} />
+          <Route path="/update-password" element={<UpdatePassword />} />
+          
+          <Route path="/" element={
+            <ProtectedRoute allowedRoles={['admin', 'staff', 'rider']} currentRole={role}>
+              {role === 'rider' ? <RiderDashboard /> : <Dashboard />}
+            </ProtectedRoute>
+          } />
+          <Route path="/bookings" element={<ProtectedRoute allowedRoles={['admin', 'staff']} currentRole={role}><Bookings  /></ProtectedRoute>} />
+          <Route path="/team"     element={<ProtectedRoute allowedRoles={['admin', 'staff']} currentRole={role}><Team      /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute allowedRoles={['admin', 'staff']} currentRole={role}><Settings  /></ProtectedRoute>} />
+          <Route path="/rider/tasks" element={<ProtectedRoute allowedRoles={['rider']} currentRole={role}><RiderTasks  /></ProtectedRoute>} />
+          <Route path="/rider/settings" element={<ProtectedRoute allowedRoles={['rider']} currentRole={role}><Settings  /></ProtectedRoute>} />
+          <Route path="/rider/earnings" element={<ProtectedRoute allowedRoles={['rider']} currentRole={role}><RiderEarnings  /></ProtectedRoute>} />
           <Route path="*"         element={<Navigate to="/" replace />} />
         </Routes>
-      </Suspense>
       <CookieConsent />
     </Router>
   );

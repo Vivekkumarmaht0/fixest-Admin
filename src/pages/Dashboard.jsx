@@ -33,11 +33,26 @@ export default function Dashboard() {
   const [recent, setRecent] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { 
+    fetchData(); 
 
-  const fetchData = async () => {
+    const channel = supabase
+      .channel('admin-dashboard-realtime')
+      .on('postgres', { event: '*', schema: 'public', table: 'bookings' }, () => {
+        fetchData(true);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const fetchData = async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
-      const { data } = await supabase.from('bookings').select('*').order('created_at', { ascending: false });
+      // Only fetch the fields we absolutely need to compute stats and show recent activity
+      const { data } = await supabase.from('bookings').select('id, status, created_at, full_name, brand, model, service_id').order('created_at', { ascending: false });
       if (!data) return;
       const counts = data.reduce((acc, b) => {
         acc.total++;
@@ -51,7 +66,7 @@ export default function Dashboard() {
     } catch (err) {
       console.error(err);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 

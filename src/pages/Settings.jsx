@@ -6,6 +6,7 @@ export default function Settings() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName]   = useState('');
   const [email, setEmail]         = useState('');
+  const [phone, setPhone]         = useState('');
   const [role, setRole]           = useState('');
   const [profileId, setProfileId] = useState(null);
   
@@ -38,6 +39,7 @@ export default function Settings() {
           const names = (data.full_name || '').split(' ');
           setFirstName(names[0] || '');
           setLastName(names.slice(1).join(' ') || '');
+          setPhone(data.phone || '');
           setRole(data.role || 'Admin');
         }
       } catch (err) {
@@ -56,10 +58,11 @@ export default function Settings() {
 
     try {
       const fullName = [firstName.trim(), lastName.trim()].filter(Boolean).join(' ');
+      const cleanPhone = phone.trim() ? phone.trim() : null;
       
       const { error } = await supabase
         .from('profiles')
-        .update({ full_name: fullName })
+        .update({ full_name: fullName, phone: cleanPhone })
         .eq('id', profileId);
 
       if (error) throw error;
@@ -168,6 +171,16 @@ export default function Settings() {
                         className="glass-input w-full pl-9 sm:pl-10 pr-4 py-2.5 rounded-xl text-[14px] text-[#737686] bg-[#f8fafc]/50 cursor-not-allowed" />
                     </div>
                     <p className="text-[10px] text-[#737686] mt-1">Email cannot be changed directly.</p>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-[11px] sm:text-[12px] font-medium text-[#434655] mb-1.5 tracking-wide">Phone Number</label>
+                    <div className="relative">
+                      <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#737686] text-[18px] pointer-events-none">phone</span>
+                      <input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
+                        placeholder="Phone Number"
+                        className="glass-input w-full pl-9 sm:pl-10 pr-4 py-2.5 rounded-xl text-[14px] text-[#0b1c30]" />
+                    </div>
+                    <p className="text-[10px] text-[#737686] mt-1">Add a phone number to use it for logging in.</p>
                   </div>
                   <div className="sm:col-span-2">
                     <label className="block text-[11px] sm:text-[12px] font-medium text-[#434655] mb-1.5 tracking-wide">Role / Title</label>

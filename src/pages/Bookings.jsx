@@ -80,7 +80,7 @@ function getMobileStatusStyle(status = '') {
    DetailPanel — defined OUTSIDE Bookings to prevent remounting
    on every parent state change (e.g. repairCostInput keystrokes)
    ───────────────────────────────────────────────────────────── */
-function DetailPanel({ selected, onClose, updating, onUpdateStatus, repairCostInput, onRepairCostChange, savingCost, costSaved, onSaveRepairCost, onMarkPaid, onProcessRefund }) {
+function DetailPanel({ selected, onClose, updating, onUpdateStatus, repairCostInput, onRepairCostChange, savingCost, costSaved, onSaveRepairCost, onMarkPaid, onProcessRefund, riders, onAssignRider }) {
   const [copied, setCopied] = React.useState(false);
   const [phoneCopied, setPhoneCopied] = React.useState(false);
 
@@ -429,6 +429,29 @@ function DetailPanel({ selected, onClose, updating, onUpdateStatus, repairCostIn
           </div>
         </div>
 
+        {/* RIDER ASSIGNMENT */}
+        <div>
+          <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">Rider Assignment</p>
+          <div className="bg-white rounded-2xl p-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+            <p className="text-[12px] text-slate-500 mb-3 leading-relaxed">
+              Assign a rider to pick up or deliver the device. They will be notified automatically.
+            </p>
+            <div className="flex items-center gap-2">
+              <select
+                value={selected.assigned_rider || ''}
+                onChange={(e) => onAssignRider(selected.id, e.target.value)}
+                disabled={updating}
+                className="w-full h-11 px-3 rounded-xl border-2 border-slate-200 focus:border-[#004ac6] focus:outline-none text-[14px] font-bold text-slate-900 bg-slate-50 transition-colors disabled:opacity-50"
+              >
+                <option value="">Unassigned</option>
+                {riders.map(r => (
+                  <option key={r.id} value={r.id}>{r.full_name || r.email || 'Unknown Rider'}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       {/* Footer */}
@@ -461,13 +484,31 @@ export default function Bookings() {
   const [repairCostInput, setRepairCostInput] = useState('');
   const [savingCost, setSavingCost] = useState(false);
   const [costSaved, setCostSaved]   = useState(false);
+  const [riders, setRiders]         = useState([]);
 
   const getStatusCount = (s) => {
     if (s === 'All') return bookings.length;
     return bookings.filter(b => b.status === s).length;
   };
 
-  useEffect(() => { fetchBookings(); }, []);
+  useEffect(() => { 
+    fetchBookings(); 
+    fetchRiders(); 
+
+    const channel = supabase
+      .channel('admin-bookings-realtime')
+      .on('postgres', { event: '*', schema: 'public', table: 'bookings' }, (payload) => {
+        fetchBookings(true);
+        if (payload.new && payload.new.id) {
+          setSelected(prev => (prev && prev.id === payload.new.id ? { ...prev, ...payload.new } : prev));
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   useEffect(() => {
     if (bookings.length > 0 && location.state?.searchBookingId) {
@@ -503,6 +544,37 @@ export default function Bookings() {
     } catch (err) { console.error(err); }
     finally { setLoading(false); setRefreshing(false); }
   };
+
+  const fetchRiders = async () => {
+    try {
+      const { data, error } = await supabase.from('profiles').select('id, full_name, email').eq('role', 'rider');
+      if (error) throw error;
+      setRiders(data || []);
+    } catch (err) { console.error('Error fetching riders:', err); }
+  };
+
+  const assignRider = useCallback(async (bookingId, riderId) => {
+    setUpdating(true);
+    try {
+      const { error } = await supabase.from('bookings').update({ assigned_rider: riderId || null }).eq('id', bookingId);
+      if (error) throw error;
+      
+      const updated = { ...selected, assigned_rider: riderId || null };
+      setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, assigned_rider: riderId || null } : b));
+      setSelected(updated);
+      
+      // Notify rider
+      if (riderId) {
+        await supabase.from('notifications').insert({
+          user_id: riderId,
+          title: 'New Task Assigned',
+          message: `You have been assigned to order ${formatBookingId(selected)}. Please check your Tasks.`,
+          type: 'new_booking'
+        });
+      }
+    } catch (err) { alert('Failed to assign rider: ' + err.message); }
+    finally { setUpdating(false); }
+  }, [selected]);
 
   const updateStatus = useCallback(async (id, newStatus) => {
     setUpdating(true);
@@ -647,6 +719,8 @@ export default function Bookings() {
     onSaveRepairCost: saveRepairCost,
     onMarkPaid: markPaid,
     onProcessRefund: processRefund,
+    riders,
+    onAssignRider: assignRider,
   };
 
   const setQuickDate = (daysOffset) => {

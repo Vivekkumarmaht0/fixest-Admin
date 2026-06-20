@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../utils/supabase';
 
 export default function ForgotPassword() {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
@@ -15,8 +15,23 @@ export default function ForgotPassword() {
     setError(null);
     setMessage(null);
 
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + '/login'
+    const isPhone = /^\+?[0-9\s\-]+$/.test(identifier) && !identifier.includes('@');
+    let targetEmail = identifier;
+
+    if (isPhone) {
+      const formattedPhone = identifier.replace(/[\s\-]/g, '');
+      const { data: emailData, error: rpcError } = await supabase.rpc('get_email_by_phone', { p_phone: formattedPhone });
+      
+      if (rpcError || !emailData) {
+        setError('No account found with this phone number.');
+        setLoading(false);
+        return;
+      }
+      targetEmail = emailData;
+    }
+
+    const { data, error } = await supabase.auth.resetPasswordForEmail(targetEmail, {
+      redirectTo: window.location.origin + '/update-password'
     });
 
     if (error) {
@@ -42,7 +57,7 @@ export default function ForgotPassword() {
             <span className="material-symbols-outlined icon-fill text-[#004ac6] text-4xl">lock_reset</span>
           </div>
           <h1 className="text-[32px] font-bold tracking-tight text-[#0b1c30] leading-tight">Reset Password</h1>
-          <p className="text-[14px] text-[#434655] mt-2">Enter your email and we will send reset instructions.</p>
+          <p className="text-[14px] text-[#434655] mt-2">Enter your email or phone number and we will send reset instructions.</p>
         </div>
 
         <div className="glass-panel rounded-2xl p-5 sm:p-8 shadow-2xl">
@@ -63,17 +78,17 @@ export default function ForgotPassword() {
           <form onSubmit={handleReset} className="space-y-5">
             <div>
               <label className="block text-[12px] font-medium text-[#434655] mb-1.5 tracking-wide">
-                Email Address
+                Email or Phone Number
               </label>
               <div className="relative">
                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#737686] text-[20px] pointer-events-none">
-                  mail
+                  contact_mail
                 </span>
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@fixest.com"
+                  type="text"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
+                  placeholder="Email or Phone Number"
                   required
                   className="glass-input w-full pl-10 pr-4 py-2.5 rounded-xl text-[14px] text-[#0b1c30] placeholder:text-[#737686]"
                 />

@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { supabase } from '../utils/supabase';
 
 export default function Login() {
-  const [email, setEmail]       = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState(null);
@@ -34,7 +34,7 @@ export default function Login() {
             .eq('id', session.user.id)
             .maybeSingle();
 
-          if (!profile || (profile.role !== 'admin' && profile.role !== 'staff')) {
+          if (!profile || (profile.role !== 'admin' && profile.role !== 'staff' && profile.role !== 'rider')) {
             setPendingApproval(true);
           }
         }
@@ -52,7 +52,24 @@ export default function Login() {
     setLoading(true);
     setError(null);
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const isPhone = /^\+?[0-9\s\-]+$/.test(identifier) && !identifier.includes('@');
+    let credentials = {};
+
+    if (isPhone) {
+      const formattedPhone = identifier.replace(/[\s\-]/g, '');
+      const { data: emailData, error: rpcError } = await supabase.rpc('get_email_by_phone', { p_phone: formattedPhone });
+      
+      if (rpcError || !emailData) {
+        setError('No account found with this phone number. Please check the number or sign up.');
+        setLoading(false);
+        return;
+      }
+      credentials = { email: emailData, password };
+    } else {
+      credentials = { email: identifier, password };
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword(credentials);
 
     if (error) {
       setError(error.message);
@@ -66,7 +83,8 @@ export default function Login() {
       return;
     }
 
-    window.location.reload();
+    // App.jsx's onAuthStateChange listener will automatically detect the new session
+    // and seamlessly route the user to the correct dashboard without an expensive page reload!
   };
 
   const handleSignOut = async () => {
@@ -74,7 +92,6 @@ export default function Login() {
     setCurrentUser(null);
     setPendingApproval(false);
     localStorage.removeItem('fixest_demo');
-    window.location.reload();
   };
 
   const handleRefresh = () => {
@@ -135,7 +152,7 @@ export default function Login() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-[#737686] text-[18px]">account_circle</span>
-                  <span className="text-[13px] font-bold text-[#0b1c30] truncate">{currentUser?.email}</span>
+                  <span className="text-[13px] font-bold text-[#0b1c30] truncate">{currentUser?.email || currentUser?.phone}</span>
                 </div>
               </div>
 
@@ -161,20 +178,20 @@ export default function Login() {
           ) : (
             <>
               <form onSubmit={handleLogin} className="space-y-5">
-                {/* Email */}
+                {/* Email or Phone */}
                 <div>
                   <label className="block text-[12px] font-medium text-[#434655] mb-1.5 tracking-wide">
-                    Email Address
+                    Email or Phone Number
                   </label>
                   <div className="relative">
                     <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#737686] text-[20px] pointer-events-none">
-                      mail
+                      contact_mail
                     </span>
                     <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="admin@fixest.com"
+                      type="text"
+                      value={identifier}
+                      onChange={(e) => setIdentifier(e.target.value)}
+                      placeholder="Email or Phone Number"
                       required
                       className="glass-input w-full pl-10 pr-4 py-2.5 rounded-xl text-[14px] text-[#0b1c30] placeholder:text-[#737686]"
                     />
@@ -197,7 +214,7 @@ export default function Login() {
                       type={showPass ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="••••••••"
+                      placeholder="Password"
                       required
                       className="glass-input w-full pl-10 pr-10 py-2.5 rounded-xl text-[14px] text-[#0b1c30] placeholder:text-[#737686]"
                     />

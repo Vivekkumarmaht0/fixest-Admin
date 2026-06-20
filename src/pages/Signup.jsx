@@ -4,8 +4,10 @@ import { supabase } from '../utils/supabase';
 
 export default function Signup() {
   const [fullName, setFullName] = useState('');
-  const [email, setEmail]       = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('');
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState(null);
   const [success, setSuccess]   = useState(false);
@@ -18,6 +20,18 @@ export default function Signup() {
     setError(null);
     setSuccess(false);
 
+    if (!role) {
+      setError('Please select an account role.');
+      setLoading(false);
+      return;
+    }
+
+    if (!email || !phone) {
+      setError('Please provide both an Email Address and a Phone Number.');
+      setLoading(false);
+      return;
+    }
+
     try {
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
@@ -25,12 +39,19 @@ export default function Signup() {
         options: {
           data: {
             full_name: fullName,
+            phone: phone,
+            role: role === 'admin' ? 'customer' : role
           }
         }
       });
 
       if (signUpError) {
         throw signUpError;
+      }
+
+      // Supabase returns an empty identities array if the email is already registered
+      if (data?.user?.identities?.length === 0) {
+        throw new Error('This email address is already registered. Please use a different email or sign in.');
       }
 
       setSuccess(true);
@@ -74,7 +95,9 @@ export default function Signup() {
           {success && (
             <div className="mb-5 flex items-center gap-3 px-4 py-3 rounded-xl bg-[#e8f5e9] border border-[#2e7d32]/20 text-[#1b5e20] text-[12.5px] font-medium leading-relaxed">
               <span className="material-symbols-outlined text-[18px] flex-shrink-0">check_circle</span>
-              Registration successful! Your account has been created and is pending admin promotion.
+              {role === 'admin' 
+                ? 'Registration successful! Your account has been created and is pending admin promotion.' 
+                : 'Registration successful! Your account has been created.'}
             </div>
           )}
 
@@ -92,7 +115,7 @@ export default function Signup() {
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Alex Mercer"
+                  placeholder="Full Name"
                   required
                   className="glass-input w-full pl-10 pr-4 py-2 rounded-xl text-[13.5px] text-[#0b1c30] placeholder:text-[#737686]"
                 />
@@ -112,10 +135,55 @@ export default function Signup() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="operator@fixest.com"
+                  placeholder="Email Address"
                   required
                   className="glass-input w-full pl-10 pr-4 py-2 rounded-xl text-[13.5px] text-[#0b1c30] placeholder:text-[#737686]"
                 />
+              </div>
+            </div>
+
+            {/* Phone */}
+            <div>
+              <label className="block text-[12px] font-medium text-[#434655] mb-1 tracking-wide">
+                Phone Number
+              </label>
+              <div className="relative">
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#737686] text-[19px] pointer-events-none">
+                  phone
+                </span>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="Phone Number"
+                  required
+                  className="glass-input w-full pl-10 pr-4 py-2 rounded-xl text-[13.5px] text-[#0b1c30] placeholder:text-[#737686]"
+                />
+              </div>
+            </div>
+
+            {/* Role Selection */}
+            <div>
+              <label className="block text-[12px] font-medium text-[#434655] mb-1 tracking-wide">
+                Account Role
+              </label>
+              <div className="relative">
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#737686] text-[19px] pointer-events-none">
+                  badge
+                </span>
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  required
+                  className={`glass-input w-full pl-10 pr-4 py-2 rounded-xl text-[13.5px] appearance-none bg-white/40 cursor-pointer ${!role ? 'text-[#737686]' : 'text-[#0b1c30]'}`}
+                >
+                  <option value="" disabled hidden>Select Role</option>
+                  <option value="rider" className="text-[#0b1c30]">Rider</option>
+                  <option value="admin" className="text-[#0b1c30]">Admin</option>
+                </select>
+                <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[#737686] pointer-events-none">
+                  expand_more
+                </span>
               </div>
             </div>
 
@@ -130,7 +198,7 @@ export default function Signup() {
                   type={showPass ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="Password"
                   required
                   minLength={6}
                   className="glass-input w-full pl-10 pr-10 py-2 rounded-xl text-[13.5px] text-[#0b1c30] placeholder:text-[#737686]"
